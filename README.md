@@ -1,1 +1,1 @@
-# Sistema-de-Programaci-n-de-Horarios-Acad-micos
+# Sistema-de-Programacion-de-Horarios-Academicos
