@@ -1,0 +1,366 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Horario Académico | Prototipo</title>
+<style>
+:root{color-scheme:light;--bg:#edf2f8;--paper:#fff;--ink:#14233b;--muted:#66758c;--line:#d5dfeb;--soft:#f3f6fa;--blue:#155eef;--blue2:#123a70;--pale:#eaf1ff;--conflict:#c5283d;--conflict-bg:#fff0f2;--ok:#087e68;--ok-bg:#e8f8f3;--warn:#a45a00;--warn-bg:#fff6e8;--focus:#72a4ff;--sans:Inter,"Segoe UI",Arial,sans-serif;--mono:"SFMono-Regular",Consolas,monospace}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#e7edf6 0%,#f6f8fc 48%,#e4edf9 100%);color:var(--ink);font:15px/1.55 var(--sans);padding:28px 22px 48px;min-height:100vh}
+.wrap{max-width:1500px;margin:0 auto;display:grid;gap:20px}
+header.app{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;justify-content:space-between;background:#10294f;color:#fff;border-radius:8px;padding:26px 32px;box-shadow:0 18px 40px #10294f24;position:relative;overflow:hidden}
+header.app:before{content:"";position:absolute;inset:auto -40px -100px auto;width:330px;height:230px;background:#155eef;transform:rotate(-22deg);opacity:.9}
+header.app h1{font-size:clamp(1.35rem,2.4vw,2rem);line-height:1.15;margin:0;font-weight:800;letter-spacing:-.04em;position:relative;z-index:1}
+header.app h1:before{content:"PLANIFICACIÓN ACADÉMICA";display:block;font-size:.68rem;letter-spacing:.19em;font-weight:750;color:#8fb7ff;margin-bottom:10px}
+.meta{position:relative;z-index:1;color:#d9e6ff;font-size:.85rem;max-width:460px}
+.meta b{color:#fff}
+nav.tabs{display:flex;flex-wrap:wrap;gap:8px}
+nav.tabs button{border:1px solid #c9d6e7;background:#fff;color:#17427f;border-radius:7px;padding:10px 15px;font-weight:750;cursor:pointer}
+nav.tabs button[aria-selected=true]{background:#155eef;border-color:#155eef;color:#fff;box-shadow:0 5px 12px #155eef2a}
+select,button,input{font:inherit}
+select{background:#fff;color:var(--ink);border:1px solid #cbd8e8;border-radius:7px;padding:9px 12px;max-width:100%}
+button{cursor:pointer;border:1px solid #c9d6e7;background:#fff;color:#17427f;border-radius:7px;padding:9px 15px;font-weight:750;transition:background .15s,border-color .15s}
+button:hover{background:#edf3ff;border-color:#7ca5ec}
+button.primary{background:#155eef;color:#fff;border-color:#155eef}button.primary:hover{background:#104ac3}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media(max-width:1000px){.main{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--paper);border:1px solid #d4dfed;border-radius:8px;padding:22px;min-width:0;box-shadow:0 8px 26px #17365d0b}
+.card h2{font-size:1.1rem;margin:0 0 14px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:11px}
+.card h2:before{content:"";display:inline-block;width:5px;height:22px;background:#155eef;border-radius:2px}
+.card h3{font-size:.95rem;margin:16px 0 8px}
+.lead{color:var(--muted);margin:-6px 0 16px;max-width:85ch}
+.gridbox{overflow-x:auto;border:1px solid #cfdbea;border-radius:7px;background:#fff}
+table.week{border-collapse:separate;border-spacing:0;width:100%;min-width:760px;table-layout:fixed;font-size:.82rem}
+.week th{font-weight:800;color:#405572;padding:12px 9px;border-bottom:2px solid #d8e3f1;background:#f1f5fb;text-align:left;text-transform:uppercase;letter-spacing:.06em;font-size:.68rem}
+.week th.h{width:104px;font-family:var(--mono);font-size:.7rem;color:#1b477e}
+.week td{border-bottom:1px solid #e1e8f1;border-right:1px solid #e1e8f1;height:84px;padding:6px;vertical-align:top}
+.week td:last-child{border-right:0}.week tbody tr:last-child td{border-bottom:0}
+.week td.off{background:repeating-linear-gradient(135deg,#f7f9fc 0 8px,#e8eef6 8px 10px)}
+.ses{border-top:3px solid #2b6ce8;border-radius:5px;padding:7px 8px;background:#eaf1ff;height:100%;min-height:66px;overflow:hidden}
+.ses b{display:block;font-weight:800;line-height:1.25;color:#163d79;font-size:.8rem}
+.ses span{display:block;margin-top:5px;color:#5a6f8d;font-family:var(--mono);font-size:.67rem}
+.ses.bad{background:var(--conflict-bg);border-top-color:var(--conflict);box-shadow:inset 0 0 0 1px #f4c6cc}.ses.bad b{color:#a11d30}
+.ses.new{background:var(--ok-bg);border-top-color:var(--ok);box-shadow:inset 0 0 0 2px #7fd3bd}.ses.new b{color:#086a59}
+.ses.mark{background:var(--warn-bg);border-top-color:var(--warn);box-shadow:inset 0 0 0 1px #f2cf9b}.ses.mark b{color:#7a4300}
+.alert,.okmsg,.info{border-radius:8px;padding:18px;border:1px solid #efb9c1;background:#fff1f3}
+.alert .icon,.okmsg .icon,.info .icon{font-size:.72rem;font-weight:850;letter-spacing:.12em;text-transform:uppercase}
+.alert .icon{color:#b51f35}.okmsg{border-color:#a8e1d2;background:var(--ok-bg)}.okmsg .icon{color:var(--ok)}
+.info{border-color:#c9d8f3;background:#f4f8ff}.info .icon{color:#155eef}
+.alert p,.okmsg p,.info p{margin:9px 0 12px}
+.muted{color:var(--muted)}.small{font-size:.85rem}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.stat{background:var(--soft);border:1px solid var(--line);border-radius:7px;padding:10px 12px}
+.stat .v{font-size:1.3rem;font-weight:800;color:#123a70;font-variant-numeric:tabular-nums}
+.stat .k{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.controls input[type=range]{flex:1;min-width:180px;accent-color:#155eef}
+.counter{font-family:var(--mono);font-weight:800;color:#155eef;min-width:90px}
+.steps{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:7px;margin-top:14px}
+.steps table{width:100%;border-collapse:collapse;font-size:.8rem}
+.steps th,.steps td{padding:6px 9px;border-bottom:1px solid #eef2f7;text-align:left}
+.steps th{position:sticky;top:0;background:#f1f5fb;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:#405572}
+.steps tr{cursor:pointer}.steps tr.cur td{background:#eaf1ff;font-weight:700}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:12px 0 16px}
+.inv{border:1px solid #d5dfeb;border-left:4px solid #155eef;border-radius:6px;padding:13px;background:#f8faff;font-size:.9rem}
+.inv strong{display:block;margin:6px 0;color:#183e76}.inv .tag{font-family:var(--mono);font-size:.72rem;color:#155eef}
+.field{display:grid;gap:6px;margin-bottom:14px}.field label{font-size:.78rem;color:#435875;font-weight:800;text-transform:uppercase;letter-spacing:.035em}
+.field select{width:100%;max-width:620px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid #a8e1d2;background:var(--ok-bg);color:#075e50;border-radius:999px;padding:7px 13px;font-weight:700;font-size:.85rem}
+.chip:hover{background:#d3f2e9;border-color:#5cc4a7}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.verdict{margin-top:14px;border-radius:7px;padding:13px 16px}
+.verdict.no{border:1px solid #efb9c1;background:#fff1f3;color:#862033}.verdict.yes{border:1px solid #a8e1d2;background:var(--ok-bg);color:#075e50}
+.verdict ul{margin:8px 0;padding-left:20px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.case{border:1px solid var(--line);border-radius:8px;padding:16px;background:#fff;display:grid;gap:8px;align-content:start}
+.case h3{margin:0;font-size:.98rem}
+.badge{display:inline-block;border-radius:999px;padding:3px 10px;font-size:.72rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}.badge.bad{background:var(--conflict-bg);color:var(--conflict)}.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.diag{background:#10294f;color:#e0eaff;border-radius:7px;padding:10px 12px;font-family:var(--mono);font-size:.76rem;white-space:pre-wrap}
+table.data{width:100%;border-collapse:collapse;font-size:.88rem}
+table.data th,table.data td{padding:9px 10px;border-bottom:1px solid #e3e9f2;text-align:left;font-variant-numeric:tabular-nums}
+table.data th{background:#f1f5fb;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#405572}
+.bars{display:grid;gap:10px;margin-top:16px}
+.bar{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;font-size:.85rem}
+.track{position:relative;height:22px;background:#eef3fa;border-radius:5px;overflow:hidden}
+.fill{height:100%;background:#155eef;border-radius:5px}
+.limit{position:absolute;top:0;bottom:0;width:2px;background:var(--conflict)}
+.side{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:16px}
+@media(max-width:640px){body{padding:12px 10px 28px}.card{padding:15px}.side{grid-template-columns:minmax(0,1fr)}.bar{grid-template-columns:80px 1fr 70px}}
+</style></head><body>
+<div class="wrap">
+  <header class="app">
+    <h1>Horario académico · Ingeniería de Sistemas</h1>
+    <div class="meta" id="meta"></div>
+  </header>
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+
+  <!-- 1. GENERACIÓN PASO A PASO -->
+  <section data-tab="gen">
+    <div class="main">
+      <div class="card">
+        <h2>Así construye el motor el horario</h2>
+        <p class="lead">El motor ubica una clase por paso. En cada paso elige la clase con menos opciones posibles, la pone en la mejor franja y aula disponibles, y descarta las opciones que dejan de ser posibles para las demás clases. Mueva la barra o pulse Reproducir.</p>
+        <div class="controls">
+          <label for="g-grupo" class="small muted">Grupo</label><select id="g-grupo"></select>
+          <label class="small"><input type="checkbox" id="g-seguir" checked> Seguir la clase de cada paso</label>
+        </div>
+        <div class="controls">
+          <button id="g-play" class="primary">Reproducir</button>
+          <input type="range" id="g-slider" min="0" value="0" aria-label="Paso">
+          <span class="counter" id="g-counter"></span>
+        </div>
+        <div class="gridbox"><table class="week" id="g-tabla"></table></div>
+        <div class="steps"><table><thead><tr><th>Paso</th><th>Clase</th><th>Grupo</th><th>Opciones</th><th>Ubicada en</th><th>Aula</th><th>Descartadas</th></tr></thead><tbody id="g-lista"></tbody></table></div>
+      </div>
+      <aside style="display:grid;gap:16px">
+        <div class="info"><div class="icon" id="g-titulo">Paso</div><p id="g-texto"></p></div>
+        <div class="card"><h2>Resultado</h2><div id="g-res"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 2. CONFLICTO -->
+  <section data-tab="conf" hidden>
+    <div id="c-horario" class="main">
+      <div class="card"><h2>Horario del grupo 5A con un conflicto</h2>
+        <p class="lead">El prototipo movió una clase para provocar un cruce real de docente. El verificador lo detecta y el editor calcula qué franjas lo resuelven.</p>
+        <div class="gridbox"><table class="week" id="c-tabla"></table></div></div>
+      <aside id="c-lado"></aside>
+    </div>
+    <div id="c-detalle" class="card" hidden>
+      <div class="row" style="justify-content:space-between"><h2 style="margin:0">Detalle del conflicto</h2><button id="c-volver">Volver al horario</button></div>
+      <p><strong>Causa:</strong> <span id="c-causa"></span></p>
+      <div class="two" id="c-inv"></div>
+      <div class="field"><label>Franjas sugeridas: cumplen todas las reglas</label><div class="chips" id="c-chips"></div>
+        <span class="small muted" id="c-chips-nota"></span></div>
+      <div class="field"><label for="c-franja">O elija cualquier franja</label><select id="c-franja"></select></div>
+      <div class="row"><button class="primary" id="c-validar">Validar cambio</button><button id="c-cancelar">Volver al horario</button></div>
+      <div id="c-veredicto"></div>
+    </div>
+    <div id="c-exito" class="card" hidden>
+      <div class="okmsg"><div class="icon">Cambio validado</div><p id="c-exito-txt"></p><p>¿Desea guardar el horario actualizado?</p>
+        <div class="row"><button class="primary" id="c-guardar">Guardar horario</button><button id="c-otra">Elegir otra franja</button></div></div>
+    </div>
+  </section>
+
+  <!-- 3. CASOS SIN SOLUCIÓN -->
+  <section data-tab="imp" hidden>
+    <div class="card"><h2>Casos en los que no existe un horario posible</h2>
+      <p class="lead">El sistema debe avisar que no hay horario, explicar por qué y nunca presentar un horario que rompa una regla. Cada caso se ejecutó en esta corrida.</p>
+      <div class="cards" id="i-cards"></div></div>
+  </section>
+
+  <!-- 4. ESCALABILIDAD -->
+  <section data-tab="esc" hidden>
+    <div class="card"><h2>¿Qué pasa si crecen los datos?</h2>
+      <p class="lead">Se generaron horarios con el tamaño actual y con el doble de docentes, aulas y cursos, midiendo el tiempo en este computador. La línea roja marca el máximo permitido de 5 segundos.</p>
+      <div style="overflow-x:auto"><table class="data" id="e-tabla"></table></div>
+      <div class="bars" id="e-barras"></div>
+      <h3>Si crecen los cursos pero no las aulas</h3>
+      <div class="cards" id="e-ocup"></div></div>
+  </section>
+
+  <!-- 5. PRUEBA DE CAMBIO -->
+  <section data-tab="cam" hidden>
+    <div class="card"><h2>Prueba de cambio: una preferencia se vuelve obligatoria</h2>
+      <p class="lead">La Facultad decide que una asignatura con dos o tres clases semanales no pueda tenerlas el mismo día ni en días consecutivos. Para el motor, esto es agregar una regla nueva sin modificar el resto del sistema.</p>
+      <div class="stats" id="m-stats" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))"></div>
+      <div class="controls" style="margin-top:16px"><label for="m-grupo" class="small muted">Ver grupo</label><select id="m-grupo"></select>
+        <span class="small muted">Naranja: asignaturas que quedaron en días consecutivos antes del cambio. Verde: las mismas asignaturas después del cambio.</span></div>
+      <div class="side"><div><h3>Antes del cambio</h3><div class="gridbox"><table class="week" id="m-antes"></table></div></div>
+        <div><h3>Después del cambio</h3><div class="gridbox"><table class="week" id="m-despues"></table></div></div></div>
+      <h3>Qué se modificó en el código</h3>
+      <table class="data"><thead><tr><th>Parte del diseño</th><th>¿Cambió?</th><th>Detalle</th></tr></thead><tbody>
+        <tr><td>Nueva clase DiasNoConsecutivos</td><td>Sí</td><td>Archivo nuevo de 26 líneas con la regla</td></tr>
+        <tr><td>RegistroRestricciones</td><td>Sí</td><td>Dos líneas para activarla</td></tr>
+        <tr><td>Motor, estado, editor, modelo de datos, revisión previa</td><td>No</td><td>Ninguna línea</td></tr></tbody></table>
+    </div>
+  </section>
+</div>
+
+<script>
+const D = __DATA__;
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const HORAS = [7, 9, 13, 15, 17, 19];
+const F = Object.fromEntries(D.instancia.franjas.map(f => [f.id, f]));
+const SEC = D.instancia.secciones;
+const hh = h => String(h).padStart(2, "0") + ":00";
+const rango = h => `${hh(h)} a ${hh(h + 2)}`;
+const fr = id => `${DIAS[F[id].dia]} de ${rango(F[id].inicio)}`;
+const num = (x, d = 2) => Number(x).toFixed(d).replace(".", ",");
+const secDe = sid => sid.split("#")[0];
+const nClase = sid => sid.split("#")[1];
+const $ = id => document.getElementById(id);
+const MOTIVO = {
+  "RD-01": "El aula ya está ocupada por otra clase en esa franja.",
+  "RD-02": d => `El docente ${d} ya tiene otra clase en esa franja.`,
+  "RD-03": "El grupo 5A ya tiene otra asignatura en esa franja.",
+  "RD-04": "La franja no está habilitada por la universidad.",
+  "RD-06": "El aula no tiene capacidad para todos los estudiantes.",
+  "RD-07": "El aula no tiene el equipamiento que requiere la asignatura.",
+  "RD-09": d => `El docente ${d} no está disponible en esa franja.`,
+};
+const motivo = (id, d) => { const m = MOTIVO[id]; return typeof m === "function" ? m(d) : (m || "Incumple una regla obligatoria."); };
+
+/* -------- encabezado y pestañas -------- */
+$("meta").innerHTML = `Todo lo que se muestra fue calculado por el prototipo técnico el <b>${D.meta.fecha}</b>, en <b>${num(D.meta.segundos_total, 1)} s</b> (Python ${D.meta.python}). Datos de prueba, no institucionales.`;
+const TABS = [["gen", "1. Generación paso a paso"], ["conf", "2. Resolver un conflicto"], ["imp", "3. Casos sin solución"], ["esc", "4. Escalabilidad"], ["cam", "5. Prueba de cambio"]];
+$("tabs").innerHTML = TABS.map(([k, t], i) => `<button role="tab" data-k="${k}" aria-selected="${i === 0}">${t}</button>`).join("");
+$("tabs").onclick = e => {
+  const b = e.target.closest("button"); if (!b) return;
+  document.querySelectorAll("#tabs button").forEach(x => x.setAttribute("aria-selected", x === b));
+  document.querySelectorAll("section[data-tab]").forEach(s => s.hidden = s.dataset.tab !== b.dataset.k);
+};
+
+/* -------- grilla reutilizable -------- */
+function grilla(tabla, grupo, asignacion, clases = {}, secs = SEC) {
+  let html = "<thead><tr><th class='h'>Franja</th>" + DIAS.map(d => `<th>${d}</th>`).join("") + "</tr></thead><tbody>";
+  const celdas = {};
+  for (const [sid, [fid, aula]] of Object.entries(asignacion)) {
+    const s = secs[secDe(sid)]; if (!s || s.grupo !== grupo) continue;
+    const f = F[fid]; (celdas[`${f.dia}-${f.inicio}`] ||= []).push([sid, s, aula]);
+  }
+  for (const h of HORAS) {
+    html += `<tr><th class="h">${hh(h)}<br>${hh(h + 2)}</th>`;
+    for (let d = 0; d < 6; d++) {
+      if (d === 5 && h > 9) { html += "<td class='off' title='Sin franja institucional'></td>"; continue; }
+      const c = celdas[`${d}-${h}`] || [];
+      html += "<td>" + c.map(([sid, s, aula]) => `<div class="ses ${clases[sid] || ""}"><b>${s.nombre}</b><span>${s.docente} · ${aula}</span></div>`).join("") + "</td>";
+    }
+    html += "</tr>";
+  }
+  tabla.innerHTML = html + "</tbody>";
+}
+
+/* -------- 1. generación paso a paso -------- */
+const G = D.generacion, P = G.pasos.filter(p => p.tipo === "asigna");
+$("g-grupo").innerHTML = D.instancia.grupos.map(g => `<option>${g}</option>`).join("");
+$("g-slider").max = G.pasos.length;
+$("g-lista").innerHTML = G.pasos.map((p, i) => {
+  const s = SEC[secDe(p.sesion)];
+  return `<tr data-i="${i + 1}"><td>${i + 1}</td><td>${p.tipo === "retrocede" ? "Deshace: " : ""}${s.nombre} (clase ${nClase(p.sesion)})</td><td>${s.grupo}</td><td>${p.opciones ?? "—"}</td><td>${fr(p.franja)}</td><td>${p.aula}</td><td>${p.descartadas ?? "—"}</td></tr>`;
+}).join("");
+$("g-lista").onclick = e => { const tr = e.target.closest("tr"); if (tr) mostrarPaso(+tr.dataset.i); };
+function estadoEn(k) {
+  const a = {};
+  for (const p of G.pasos.slice(0, k)) { if (p.tipo === "asigna") a[p.sesion] = [p.franja, p.aula]; else delete a[p.sesion]; }
+  return a;
+}
+function mostrarPaso(k) {
+  $("g-slider").value = k; $("g-counter").textContent = `${k} / ${G.pasos.length}`;
+  const p = G.pasos[k - 1];
+  if (p && $("g-seguir").checked) $("g-grupo").value = SEC[secDe(p.sesion)].grupo;
+  grilla($("g-tabla"), $("g-grupo").value, estadoEn(k), p ? { [p.sesion]: "new" } : {});
+  document.querySelectorAll("#g-lista tr").forEach(tr => tr.classList.toggle("cur", +tr.dataset.i === k));
+  const cur = document.querySelector("#g-lista tr.cur"); if (cur) cur.scrollIntoView({ block: "nearest" });
+  if (!p) {
+    $("g-titulo").textContent = "Inicio";
+    $("g-texto").innerHTML = `Hay ${D.instancia.clases} clases por ubicar en ${D.instancia.franjas.length} franjas y ${D.instancia.aulas.length} aulas. Antes de buscar, el sistema revisó que los datos permitan construir un horario.`;
+    return;
+  }
+  const s = SEC[secDe(p.sesion)];
+  $("g-titulo").textContent = `Paso ${k} de ${G.pasos.length}`;
+  $("g-texto").innerHTML = p.tipo === "retrocede"
+    ? `La decisión anterior dejó a otra clase sin opciones, así que el motor <b>deshizo</b> la ubicación de ${s.nombre} (${s.grupo}) y probará otra franja.`
+    : `El motor eligió <b>${s.nombre}</b>, grupo ${s.grupo}, clase ${nClase(p.sesion)} de ${s.sesiones}, porque era la que tenía <b>menos opciones posibles: ${p.opciones}</b>.<br><br>La ubicó el <b>${fr(p.franja).toLowerCase()}</b> en el aula <b>${p.aula}</b>${s.requisitos.length ? ` (requiere ${s.requisitos.map(r => r === "sillas_moviles" ? "sillas móviles" : r).join(" y ")})` : ""} con el docente ${s.docente}.<br><br>Después descartó <b>${p.descartadas} opciones</b> de otras clases que dejaron de ser posibles. Quedan ${p.pendientes} clases por ubicar.`;
+}
+let timer = null;
+$("g-play").onclick = () => {
+  if (timer) { clearInterval(timer); timer = null; $("g-play").textContent = "Reproducir"; return; }
+  if (+$("g-slider").value >= G.pasos.length) mostrarPaso(0);
+  $("g-play").textContent = "Pausar";
+  timer = setInterval(() => { const k = +$("g-slider").value + 1; mostrarPaso(k); if (k >= G.pasos.length) { clearInterval(timer); timer = null; $("g-play").textContent = "Reproducir"; } }, 450);
+};
+$("g-slider").oninput = e => mostrarPaso(+e.target.value);
+$("g-grupo").onchange = () => { $("g-seguir").checked = false; mostrarPaso(+$("g-slider").value); };
+$("g-res").innerHTML = `<div class="${G.incumplimientos === 0 ? "okmsg" : "alert"}"><div class="icon">${G.estado === "factible" ? "Horario completo" : "Sin horario"}</div>
+  <p>El verificador independiente revisó todas las reglas obligatorias y encontró <b>${G.incumplimientos} incumplimientos</b>.</p></div>
+  <div class="stats">
+  <div class="stat"><div class="v">${num(G.segundos)} s</div><div class="k">Tiempo de generación</div></div>
+  <div class="stat"><div class="v">${P.length}</div><div class="k">Clases ubicadas</div></div>
+  <div class="stat"><div class="v">${G.retrocesos}</div><div class="k">Decisiones deshechas</div></div>
+  <div class="stat"><div class="v">${num(G.blandas.pct_franjas_preferidas_RB02, 1)} %</div><div class="k">En franjas preferidas</div></div>
+  <div class="stat"><div class="v">${G.blandas.pares_dias_consecutivos_RB01}</div><div class="k">Asignaturas en días seguidos</div></div>
+  <div class="stat"><div class="v">${G.blandas.pares_mismo_dia}</div><div class="k">Asignaturas repetidas un día</div></div></div>`;
+mostrarPaso(0);
+
+/* -------- 2. conflicto -------- */
+const C = D.conflicto, cS = SEC[secDe(C.sesion)], cO = SEC[secDe(C.otra)];
+let cAsig, cResuelto, cElegida;
+function cReiniciar() { cAsig = JSON.parse(JSON.stringify(C.asignacion)); cResuelto = false; cElegida = null; cPintar(); cVista("c-horario"); }
+function cVista(id) { for (const v of ["c-horario", "c-detalle", "c-exito"]) $(v).hidden = v !== id; }
+function cPintar() {
+  grilla($("c-tabla"), "5A", cAsig, cResuelto ? { [C.sesion]: "new" } : { [C.sesion]: "bad" });
+  $("c-lado").innerHTML = cResuelto
+    ? `<div class="okmsg"><div class="icon">Sin conflictos</div><p>Horario guardado. ${cS.nombre} quedó el ${fr(cAsig[C.sesion][0]).toLowerCase()}, aula ${cAsig[C.sesion][1]}.</p><button id="c-reset">Reiniciar la prueba</button></div>`
+    : `<div class="alert" role="alert"><div class="icon">Conflicto detectado</div><p>El docente ${C.docente} tiene dos clases el ${fr(C.franja).toLowerCase()}. El verificador encontró ${C.detectados} incumplimiento en todo el horario.</p><button class="primary" id="c-revisar">Revisar</button></div>`;
+  if ($("c-revisar")) $("c-revisar").onclick = cDetalle;
+  if ($("c-reset")) $("c-reset").onclick = cReiniciar;
+}
+function cDetalle() {
+  $("c-causa").textContent = `El docente ${C.docente} está asignado a ${cS.nombre} (grupo ${cS.grupo}) y a ${cO.nombre} (grupo ${cO.grupo}) el ${fr(C.franja).toLowerCase()}. Un docente no puede dictar dos clases al mismo tiempo.`;
+  $("c-inv").innerHTML = [[cS, C.asignacion[C.sesion][1], "Se va a mover"], [cO, C.asignacion[C.otra][1], "Se mantiene"]]
+    .map(([s, aula, rol]) => `<div class="inv"><div class="tag">${C.docente} · ${fr(C.franja)} · ${rol}</div><strong>${s.nombre}</strong><div class="muted">Grupo ${s.grupo} · Aula ${aula}</div></div>`).join("");
+  $("c-chips").innerHTML = C.sugeridas.map(([fid, aula]) => `<button class="chip" data-f="${fid}">${fr(fid)} · ${aula}</button>`).join("");
+  $("c-chips-nota").textContent = `El editor revisó las ${C.opciones.length} franjas en ${num(C.ms_alternativas, 1)} ms; ${C.opciones.filter(o => o.valida).length} sirven.`;
+  $("c-franja").innerHTML = `<option value="">Seleccione una franja…</option>` + C.opciones.slice().sort((a, b) => a.franja - b.franja)
+    .map(o => `<option value="${o.franja}">${fr(o.franja)}</option>`).join("");
+  $("c-veredicto").innerHTML = ""; cVista("c-detalle");
+}
+function cValidar(fid) {
+  const o = C.opciones.find(x => x.franja === +fid), out = $("c-veredicto");
+  if (!o) { out.innerHTML = `<div class="verdict no">Seleccione una franja antes de validar.</div>`; return; }
+  if (!o.valida) {
+    out.innerHTML = `<div class="verdict no" role="alert"><strong>Cambio rechazado.</strong> No se puede mover la clase al ${fr(o.franja).toLowerCase()}:<ul>${o.motivos.map(m => `<li>${motivo(m, C.docente)}</li>`).join("")}</ul><span class="small">Validado en ${num(o.ms, 3)} ms. Elija otra franja o una de las sugeridas.</span></div>`;
+    return;
+  }
+  cElegida = o;
+  $("c-exito-txt").textContent = `${cS.nombre} quedaría el ${fr(o.franja).toLowerCase()} en el aula ${o.aula}. No se detectaron conflictos (validado en ${num(o.ms, 3)} ms).`;
+  cVista("c-exito");
+}
+$("c-chips").onclick = e => { const b = e.target.closest(".chip"); if (b) { $("c-franja").value = b.dataset.f; cValidar(b.dataset.f); } };
+$("c-validar").onclick = () => cValidar($("c-franja").value);
+$("c-franja").onchange = () => $("c-veredicto").innerHTML = "";
+$("c-volver").onclick = $("c-cancelar").onclick = () => cVista("c-horario");
+$("c-otra").onclick = cDetalle;
+$("c-guardar").onclick = () => { cAsig[C.sesion] = [cElegida.franja, cElegida.aula]; cResuelto = true; cPintar(); cVista("c-horario"); };
+cReiniciar();
+
+/* -------- 3. casos sin solución -------- */
+$("i-cards").innerHTML = D.imposibles.map(c => {
+  const badge = c.estado === "datos_invalidos" ? `<span class="badge ok">Detectado antes de buscar</span>`
+    : c.estado === "limite_tiempo" ? `<span class="badge warn">Tiempo agotado (${c.limite} s)</span>` : `<span class="badge bad">${c.estado}</span>`;
+  const explica = c.estado === "datos_invalidos" ? "Causa reportada al usuario:" : "El motor buscó hasta agotar el tiempo. Lo que reportó como causa:";
+  return `<div class="case"><h3>${c.titulo}</h3><div>${badge}</div><p class="small muted" style="margin:0">${c.descripcion}</p>
+    <div class="small"><b>Tiempo:</b> ${num(c.segundos)} s · <b>¿Mostró un horario inválido?</b> ${c.horario_invalido ? "Sí" : "No"}</div>
+    <div class="small">${explica}</div><div class="diag">${(c.diagnostico || []).join("\n") || "Sin detalle"}</div></div>`;
+}).join("") + `<div class="case" style="background:#f4f8ff"><h3>Qué muestran estos casos</h3><p class="small" style="margin:0">En el caso del grupo 7A, la búsqueda sola no logra explicar la causa: culpa a un docente. Con la revisión previa mejorada, el sistema detecta que las clases del grupo superan las franjas en que sus docentes están disponibles y lo avisa al instante, sin necesidad de buscar.</p></div>`;
+
+/* -------- 4. escalabilidad -------- */
+$("e-tabla").innerHTML = `<thead><tr><th>Tamaño</th><th>Docentes</th><th>Aulas</th><th>Secciones</th><th>Clases</th><th>Casos</th><th>Horarios completos</th><th>Incumplimientos</th><th>Tiempo promedio</th><th>Tiempo máximo</th></tr></thead><tbody>` +
+  D.escala.map(e => `<tr><td><b>${e.tamano}</b></td><td>${e.docentes}</td><td>${e.aulas}</td><td>${e.secciones}</td><td>${e.clases}</td><td>${e.casos}</td><td>${e.completos} de ${e.casos}</td><td>${e.incumplimientos}</td><td>${num(e.promedio)} s</td><td>${num(e.maximo)} s</td></tr>`).join("") + "</tbody>";
+const escMax = Math.max(5.5, ...D.escala.map(e => e.maximo));
+$("e-barras").innerHTML = D.escala.map(e => `<div class="bar"><b>${e.tamano}</b><div class="track"><div class="fill" style="width:${100 * e.promedio / escMax}%"></div><div class="limit" style="left:${100 * 5 / escMax}%"></div></div><span>${num(e.promedio)} s</span></div>`).join("") +
+  `<div class="small muted">Máximo permitido: 5 s (línea roja). ${D.meta.completo ? "" : "Para incluir el tamaño cuádruple ejecute: python prototipo_visual.py --completo"}</div>`;
+$("e-ocup").innerHTML = D.ocupacion.map(o => `<div class="case"><h3>${num(o.ocupacion, 1)} % de las aulas ocupadas</h3><div>${o.estado === "factible" ? `<span class="badge ok">Horario encontrado</span>` : `<span class="badge warn">No terminó en ${o.limite} s</span>`}</div><p class="small" style="margin:0">${o.clases} clases para ${o.aulas} aulas. Tiempo: ${num(o.segundos)} s.</p></div>`).join("") +
+  `<div class="case" style="background:#f4f8ff"><h3>Conclusión</h3><p class="small" style="margin:0">Si las aulas crecen con los cursos, el tiempo sigue muy por debajo del máximo. Si no crecen, el límite es físico: cuando se ocupa cerca del 80 % de las aulas, el motor ya no encuentra horario a tiempo.</p></div>`;
+
+/* -------- 5. prueba de cambio -------- */
+const M = D.cambio;
+const SECM = M.secciones;
+$("m-stats").innerHTML = `
+  <div class="stat"><div class="v">${M.antes.afectadas.length} → ${M.despues.afectadas.length}</div><div class="k">Asignaturas en días consecutivos</div></div>
+  <div class="stat"><div class="v">${M.despues.incumplimientos}</div><div class="k">Incumplimientos después del cambio</div></div>
+  <div class="stat"><div class="v">${num(M.antes.segundos)} s → ${num(M.despues.segundos)} s</div><div class="k">Tiempo de generación</div></div>
+  <div class="stat"><div class="v">${M.despues.estado === "factible" ? "Sí" : "No"}</div><div class="k">Horario completo con la regla nueva</div></div>`;
+const gruposM = [...new Set(M.antes.afectadas.map(s => SECM[s].grupo))];
+$("m-grupo").innerHTML = (gruposM.length ? gruposM : D.instancia.grupos).map(g => `<option>${g}</option>`).join("") + D.instancia.grupos.filter(g => !gruposM.includes(g)).map(g => `<option>${g}</option>`).join("");
+function mPintar() {
+  const g = $("m-grupo").value, marca = {};
+  for (const sid of Object.keys(M.antes.asignacion)) if (M.antes.afectadas.includes(secDe(sid))) marca[sid] = "mark";
+  grilla($("m-antes"), g, M.antes.asignacion, marca, SECM);
+  const marcaD = {}; for (const sid of Object.keys(marca)) marcaD[sid] = "new";
+  grilla($("m-despues"), g, M.despues.asignacion, marcaD, SECM);
+}
+$("m-grupo").onchange = mPintar; mPintar();
+</script>
+</body></html>
