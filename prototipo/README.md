@@ -1,10 +1,6 @@
 # Prototipo técnico — Sistema de Programación de Horarios Académicos (Grupo 1)
 
-Prototipo de la Fase 2 ("De la incertidumbre al diseño"). Responde la pregunta de B2.2:
-¿puede un backtracking heurístico generar un horario completo que respete las restricciones
-duras y reconocer cuando no hay solución?
-
-Los datos son sintéticos (casos de prueba), no institucionales. Supuestos en `horarios/generador.py`.
+Prototipo de la Fase 2 ("De la incertidumbre al diseño"). Responde las pregunta de B2.1 y B2.2. Los datos son sintéticos (casos de prueba), no institucionales. Supuestos en `horarios/generador.py`.
 
 ## Estructura
 - `horarios/modelo.py` — entidades (Franja, Aula, Docente, Asignatura, Sección, Sesión, Parámetros)
