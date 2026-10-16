@@ -1,0 +1,255 @@
+<title>Prototipo de Conflictos de Horario</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: wireframe de fidelidad media; grilla semanal a la izquierda, panel de conflicto a la derecha, se apilan en móvil */
+:root {
+  --bg: #f4f5f6; --paper: #ffffff; --ink: #1d2226; --muted: #5d666e; --line: #c9ced3; --soft: #e9ecee;
+  --conflict: #b3261e; --conflict-bg: #fbe9e7; --ok: #1e6b3a; --ok-bg: #e5f2ea; --focus: #2a5d9f;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15181b; --paper: #1d2125; --ink: #e6e9ec; --muted: #9aa3ab; --line: #3a4148; --soft: #262b30;
+  --conflict: #f2877e; --conflict-bg: #3a1f1d; --ok: #7dd29a; --ok-bg: #1b3325; --focus: #8fb6ea; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15181b; --paper: #1d2125; --ink: #e6e9ec; --muted: #9aa3ab; --line: #3a4148; --soft: #262b30;
+  --conflict: #f2877e; --conflict-bg: #3a1f1d; --ok: #7dd29a; --ok-bg: #1b3325; --focus: #8fb6ea; color-scheme: dark }
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--ink); font: 15px/1.45 var(--sans); padding: 16px 16px 40px }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 14px }
+header.app { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; justify-content: space-between;
+  background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px }
+header.app h1 { font-size: 1.05rem; margin: 0; font-weight: 600; text-wrap: balance }
+.sel { display: flex; gap: 8px; align-items: center; color: var(--muted); font-size: .9rem }
+select, button { font: inherit; color: var(--ink) }
+select { background: var(--paper); border: 1px solid var(--line); border-radius: 4px; padding: 6px 8px; max-width: 100% }
+button { cursor: pointer; border: 1px solid var(--ink); background: var(--paper); border-radius: 4px; padding: 8px 14px; font-weight: 500 }
+button.primary { background: var(--ink); color: var(--paper) }
+button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 14px; align-items: start }
+@media (max-width: 820px) { .main { grid-template-columns: minmax(0, 1fr) } }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; min-width: 0 }
+.card h2 { font-size: .95rem; margin: 0 0 10px; font-weight: 600 }
+.gridbox { overflow-x: auto }
+table.week { border-collapse: collapse; width: 100%; min-width: 640px; table-layout: fixed; font-size: .82rem }
+.week th { font-weight: 500; color: var(--muted); padding: 6px; border-bottom: 1px solid var(--line); text-align: left }
+.week th.h { width: 70px; font-family: var(--mono); font-variant-numeric: tabular-nums }
+.week td { border: 1px solid var(--soft); height: 62px; padding: 3px; vertical-align: top }
+.week td.off { background: repeating-linear-gradient(45deg, transparent 0 6px, var(--soft) 6px 7px) }
+.ses { border: 1px solid var(--line); border-radius: 4px; padding: 4px 6px; background: var(--soft); height: 100%; overflow: hidden }
+.ses b { display: block; font-weight: 500; line-height: 1.2 }
+.ses span { color: var(--muted); font-family: var(--mono); font-size: .74rem }
+.ses.bad { background: var(--conflict-bg); border: 2px solid var(--conflict); background-image: repeating-linear-gradient(45deg, transparent 0 7px, color-mix(in srgb, var(--conflict) 18%, transparent) 7px 9px) }
+.ses.new { background: var(--ok-bg); border: 2px solid var(--ok) }
+.alert { border: 2px solid var(--conflict); background: var(--conflict-bg); border-radius: 6px; padding: 14px }
+.alert .icon { font-family: var(--mono); font-weight: 600; color: var(--conflict); font-size: .8rem; letter-spacing: .06em; text-transform: uppercase }
+.alert p { margin: 6px 0 12px }
+.okmsg { border: 2px solid var(--ok); background: var(--ok-bg); border-radius: 6px; padding: 14px }
+.okmsg .icon { color: var(--ok); font-family: var(--mono); font-weight: 600; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase }
+.muted { color: var(--muted) }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px; margin: 10px 0 14px }
+.inv { border: 1px solid var(--line); border-radius: 4px; padding: 10px; font-size: .9rem }
+.inv .tag { font-family: var(--mono); font-size: .75rem; color: var(--muted) }
+.field { display: grid; gap: 4px; margin-bottom: 12px }
+.field label { font-size: .85rem; color: var(--muted) }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center }
+.verdict { margin-top: 12px; border-radius: 6px; padding: 12px 14px }
+.verdict.no { border: 2px solid var(--conflict); background: var(--conflict-bg) }
+.verdict.yes { border: 2px solid var(--ok); background: var(--ok-bg) }
+.verdict ul { margin: 6px 0 0; padding-left: 18px }
+.pending { font-size: .85rem; color: var(--muted); font-style: italic }
+footer.note { font-size: .8rem; color: var(--muted); max-width: 70ch }
+details.lab { background: var(--paper); border: 1px dashed var(--line); border-radius: 6px; padding: 10px 14px }
+details.lab summary { cursor: pointer; font-weight: 500 }
+.lab .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px 16px; margin: 10px 0 }
+.lab label { font-size: .88rem; display: flex; gap: 6px; align-items: flex-start }
+.lab textarea { width: 100%; min-height: 60px; font: inherit; background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 6px }
+.lab pre { white-space: pre-wrap; font-family: var(--mono); font-size: .78rem; background: var(--soft); padding: 8px; border-radius: 4px; max-height: 220px; overflow: auto }
+.timer { font-family: var(--mono); font-variant-numeric: tabular-nums }
+@media (prefers-reduced-motion: no-preference) { .ses, .alert, .okmsg { transition: background-color .2s } }
+</style>
+
+<div class="wrap">
+  <header class="app">
+    <h1>Sistema de Programación de Horarios Académicos</h1>
+    <div class="sel">
+      <label for="grupo">Grupo</label>
+      <select id="grupo"><option>5.º semestre · grupo 5A</option><option disabled>6.º semestre · grupo 6A (sin datos en el prototipo)</option><option disabled>7.º semestre · grupo 7A (sin datos en el prototipo)</option></select>
+    </div>
+  </header>
+
+  <section id="v-horario" class="main">
+    <div class="card"><h2>Horario semanal del grupo 5A</h2><div class="gridbox"><table class="week" id="tabla"></table></div></div>
+    <aside id="lado"></aside>
+  </section>
+
+  <section id="v-detalle" class="card" hidden>
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Detalle del conflicto</h2><button id="volver">Volver al horario</button></div>
+    <p><strong>Causa:</strong> <span id="causa"></span></p>
+    <div class="two" id="involucradas"></div>
+    <div class="field"><label for="mover">Asignación que desea modificar</label><select id="mover"></select></div>
+    <div class="field"><label for="franja">Nueva franja horaria</label><select id="franja"></select><span class="pending" id="pend">Alternativa pendiente de validación</span></div>
+    <div class="row"><button class="primary" id="validar">Validar cambio</button><button id="cancelar">Cancelar</button></div>
+    <div id="veredicto"></div>
+  </section>
+
+  <section id="v-exito" class="card" hidden>
+    <div class="okmsg"><div class="icon">Cambio validado</div><p id="exito-txt"></p><p>¿Desea guardar el horario actualizado?</p>
+      <div class="row"><button class="primary" id="guardar">Guardar horario</button><button id="cancelar2">Cancelar</button></div></div>
+  </section>
+
+  <details class="lab" id="lab">
+    <summary>Modo de prueba (solo para quien dirige la sesión)</summary>
+    <p class="muted" style="font-size:.85rem">Registra cada recorrido con un participante. El participante no debe ver este panel.</p>
+    <div class="row"><label for="part">Participante</label><select id="part"><option>P1</option><option>P2</option><option>P3</option><option>P4</option><option>P5</option></select>
+      <button id="iniciar">Iniciar recorrido</button><span class="timer" id="reloj">00:00</span></div>
+    <div class="grid3">
+      <label><input type="checkbox" id="c1"> Identificó la causa del conflicto sin ayuda</label>
+      <label><input type="checkbox" id="c2"> Completó la modificación sin explicaciones</label>
+      <label><input type="checkbox" id="c3"> Reconoció cuando un cambio fue rechazado</label>
+      <label><input type="checkbox" id="c4"> Pidió ayuda en algún momento</label>
+    </div>
+    <label for="obs" class="muted" style="font-size:.85rem">Observaciones</label><textarea id="obs"></textarea>
+    <div class="row" style="margin-top:8px"><button id="cerrar">Cerrar recorrido</button><button id="copiar">Copiar resultados</button><button id="reiniciar">Reiniciar prototipo</button></div>
+    <pre id="log"></pre>
+  </details>
+
+  <footer class="note">Prototipo de interacción, fidelidad media. Los datos son de prueba y no son institucionales. Las alternativas y los rechazos provienen del prototipo técnico (validación real de RD-01 a RD-09 sobre un horario generado), no están simulados.</footer>
+</div>
+
+<script>
+const D = {"grupo": "5A", "sesiones": [{"sesion": "5-01A#1", "asignatura": "Bases de Datos", "seccion": "5-01A", "docente": "D01", "aula": "S101", "dia": 0, "inicio": 7, "conflicto": true}, {"sesion": "5-05A#1", "asignatura": "Probabilidad y Estadística", "seccion": "5-05A", "docente": "D05", "aula": "S103", "dia": 0, "inicio": 13, "conflicto": false}, {"sesion": "5-04A#2", "asignatura": "Sistemas Operativos", "seccion": "5-04A", "docente": "D04", "aula": "LAB2", "dia": 0, "inicio": 17, "conflicto": false}, {"sesion": "5-03A#2", "asignatura": "Algoritmos y Complejidad", "seccion": "5-03A", "docente": "D03", "aula": "S103", "dia": 0, "inicio": 19, "conflicto": false}, {"sesion": "5-01A#3", "asignatura": "Bases de Datos", "seccion": "5-01A", "docente": "D01", "aula": "S101", "dia": 1, "inicio": 7, "conflicto": false}, {"sesion": "5-02A#1", "asignatura": "Programación Avanzada", "seccion": "5-02A", "docente": "D02", "aula": "LAB2", "dia": 1, "inicio": 15, "conflicto": false}, {"sesion": "5-05A#2", "asignatura": "Probabilidad y Estadística", "seccion": "5-05A", "docente": "D05", "aula": "S101", "dia": 2, "inicio": 13, "conflicto": false}, {"sesion": "5-06A#1", "asignatura": "Ingeniería de Software I", "seccion": "5-06A", "docente": "D06", "aula": "S202", "dia": 2, "inicio": 17, "conflicto": false}, {"sesion": "5-02A#2", "asignatura": "Programación Avanzada", "seccion": "5-02A", "docente": "D02", "aula": "LAB2", "dia": 3, "inicio": 13, "conflicto": false}, {"sesion": "5-07A#1", "asignatura": "Ética Profesional", "seccion": "5-07A", "docente": "D07", "aula": "S202", "dia": 4, "inicio": 9, "conflicto": false}, {"sesion": "5-03A#1", "asignatura": "Algoritmos y Complejidad", "seccion": "5-03A", "docente": "D03", "aula": "S202", "dia": 4, "inicio": 15, "conflicto": false}, {"sesion": "5-06A#2", "asignatura": "Ingeniería de Software I", "seccion": "5-06A", "docente": "D06", "aula": "S202", "dia": 4, "inicio": 17, "conflicto": false}, {"sesion": "5-04A#1", "asignatura": "Sistemas Operativos", "seccion": "5-04A", "docente": "D04", "aula": "LAB3", "dia": 4, "inicio": 19, "conflicto": false}, {"sesion": "5-01A#2", "asignatura": "Bases de Datos", "seccion": "5-01A", "docente": "D01", "aula": "S202", "dia": 5, "inicio": 7, "conflicto": false}], "conflicto": {"restriccion": "RD-02", "texto": "Un docente no puede tener dos sesiones simultáneas", "docente": "D01", "franja": "Lun 07-09", "dia": 0, "inicio": 7, "sesion": {"id": "5-01A#1", "asignatura": "Bases de Datos", "seccion": "5-01A", "aula": "S101"}, "otra": {"id": "6-06A#1", "asignatura": "Interacción Humano-Computador", "seccion": "6-06A", "grupo": "6A", "aula": "S201"}, "franja_original": "Jue 07-09"}, "opciones": [{"franja": "Lun 09-11", "dia": 0, "inicio": 9, "valida": false, "aula": "S101", "motivos": [{"id": "RD-02", "texto": "Un docente no puede tener dos sesiones simultáneas", "recurso": "docente D01"}]}, {"franja": "Lun 13-15", "dia": 0, "inicio": 13, "valida": false, "aula": "S101", "motivos": [{"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Lun 15-17", "dia": 0, "inicio": 15, "valida": true, "aula": "S201", "motivos": []}, {"franja": "Lun 17-19", "dia": 0, "inicio": 17, "valida": false, "aula": "S101", "motivos": [{"id": "RD-09", "texto": "El docente debe estar disponible en la franja", "recurso": "docente D01"}, {"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Lun 19-21", "dia": 0, "inicio": 19, "valida": false, "aula": "S101", "motivos": [{"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Mar 07-09", "dia": 1, "inicio": 7, "valida": false, "aula": "S101", "motivos": [{"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-02", "texto": "Un docente no puede tener dos sesiones simultáneas", "recurso": "docente D01"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Mar 09-11", "dia": 1, "inicio": 9, "valida": false, "aula": "S101", "motivos": [{"id": "RD-09", "texto": "El docente debe estar disponible en la franja", "recurso": "docente D01"}]}, {"franja": "Mar 13-15", "dia": 1, "inicio": 13, "valida": true, "aula": "S201", "motivos": []}, {"franja": "Mar 15-17", "dia": 1, "inicio": 15, "valida": false, "aula": "S101", "motivos": [{"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Mar 17-19", "dia": 1, "inicio": 17, "valida": true, "aula": "S201", "motivos": []}, {"franja": "Mar 19-21", "dia": 1, "inicio": 19, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Mié 07-09", "dia": 2, "inicio": 7, "valida": false, "aula": "S101", "motivos": [{"id": "RD-02", "texto": "Un docente no puede tener dos sesiones simultáneas", "recurso": "docente D01"}]}, {"franja": "Mié 09-11", "dia": 2, "inicio": 9, "valida": false, "aula": "S101", "motivos": [{"id": "RD-02", "texto": "Un docente no puede tener dos sesiones simultáneas", "recurso": "docente D01"}]}, {"franja": "Mié 13-15", "dia": 2, "inicio": 13, "valida": false, "aula": "S101", "motivos": [{"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Mié 15-17", "dia": 2, "inicio": 15, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Mié 17-19", "dia": 2, "inicio": 17, "valida": false, "aula": "S101", "motivos": [{"id": "RD-09", "texto": "El docente debe estar disponible en la franja", "recurso": "docente D01"}, {"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Mié 19-21", "dia": 2, "inicio": 19, "valida": true, "aula": "S201", "motivos": []}, {"franja": "Jue 07-09", "dia": 3, "inicio": 7, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Jue 09-11", "dia": 3, "inicio": 9, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Jue 13-15", "dia": 3, "inicio": 13, "valida": false, "aula": "S101", "motivos": [{"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Jue 15-17", "dia": 3, "inicio": 15, "valida": true, "aula": "S201", "motivos": []}, {"franja": "Jue 17-19", "dia": 3, "inicio": 17, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Jue 19-21", "dia": 3, "inicio": 19, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Vie 07-09", "dia": 4, "inicio": 7, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Vie 09-11", "dia": 4, "inicio": 9, "valida": false, "aula": "S101", "motivos": [{"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Vie 13-15", "dia": 4, "inicio": 13, "valida": true, "aula": "S101", "motivos": []}, {"franja": "Vie 15-17", "dia": 4, "inicio": 15, "valida": false, "aula": "S101", "motivos": [{"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Vie 17-19", "dia": 4, "inicio": 17, "valida": false, "aula": "S101", "motivos": [{"id": "RD-09", "texto": "El docente debe estar disponible en la franja", "recurso": "docente D01"}, {"id": "RD-01", "texto": "Un aula no puede tener dos sesiones simultáneas", "recurso": "aulas"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Vie 19-21", "dia": 4, "inicio": 19, "valida": false, "aula": "S101", "motivos": [{"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Sáb 07-09", "dia": 5, "inicio": 7, "valida": false, "aula": "S101", "motivos": [{"id": "RD-02", "texto": "Un docente no puede tener dos sesiones simultáneas", "recurso": "docente D01"}, {"id": "RD-03", "texto": "Un grupo no puede tener dos asignaturas simultáneas", "recurso": "grupo 5A"}]}, {"franja": "Sáb 09-11", "dia": 5, "inicio": 9, "valida": false, "aula": "S101", "motivos": [{"id": "RD-09", "texto": "El docente debe estar disponible en la franja", "recurso": "docente D01"}]}], "resumen": {"validas": 13, "total": 31}};
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+const HORAS = [7, 9, 13, 15, 17, 19];
+const hh = h => String(h).padStart(2, "0") + ":00";
+const rango = h => `${hh(h)}–${hh(h + 2)}`;
+const NOMBRE_DIA = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+const MOTIVO = {
+  "RD-01": () => "El aula ya está ocupada por otra clase en esa franja.",
+  "RD-02": () => `El docente ${D.conflicto.docente} ya tiene otra clase en esa franja.`,
+  "RD-03": () => "El grupo 5A ya tiene otra asignatura en esa franja.",
+  "RD-06": () => "El aula no tiene capacidad para la sección.",
+  "RD-07": () => "El aula no tiene las características que requiere la asignatura.",
+  "RD-09": () => `El docente ${D.conflicto.docente} no está disponible en esa franja.`,
+};
+let sesiones = D.sesiones.map(s => ({ ...s }));
+let resuelto = false, nueva = null, eventos = [], t0 = null, tick = null;
+
+function log(e) {
+  if (t0 === null) return;
+  const s = ((performance.now() - t0) / 1000).toFixed(1);
+  eventos.push(`${s}s  ${e}`);
+  document.getElementById("log").textContent = eventos.join("\n");
+}
+function vista(id) {
+  for (const v of ["v-horario", "v-detalle", "v-exito"]) document.getElementById(v).hidden = v !== id;
+}
+function pintarTabla() {
+  const t = document.getElementById("tabla");
+  let html = "<thead><tr><th class='h'>Franja</th>" + DIAS.map(d => `<th>${d}</th>`).join("") + "</tr></thead><tbody>";
+  for (const h of HORAS) {
+    html += `<tr><th class="h">${rango(h)}</th>`;
+    for (let d = 0; d < 6; d++) {
+      if (d === 5 && h > 9) { html += "<td class='off' aria-label='Sin franja institucional'></td>"; continue; }
+      const s = sesiones.find(x => x.dia === d && x.inicio === h);
+      if (!s) { html += "<td></td>"; continue; }
+      const cls = s.conflicto && !resuelto ? "bad" : (nueva && s.sesion === nueva ? "new" : "");
+      html += `<td><div class="ses ${cls}"><b>${s.asignatura}</b><span>${s.docente} · ${s.aula}</span></div></td>`;
+    }
+    html += "</tr>";
+  }
+  t.innerHTML = html + "</tbody>";
+  const lado = document.getElementById("lado");
+  if (!resuelto) {
+    lado.innerHTML = `<div class="alert" role="alert"><div class="icon">Conflicto detectado</div>
+      <p>El docente ${D.conflicto.docente} tiene dos clases programadas en la misma franja (${D.conflicto.franja.replace("-", ":00–")}:00).</p>
+      <button class="primary" id="revisar">Revisar</button></div>`;
+    document.getElementById("revisar").onclick = () => { log("Abre el detalle del conflicto"); abrirDetalle(); };
+  } else {
+    lado.innerHTML = `<div class="okmsg"><div class="icon">Sin conflictos</div><p>Horario guardado. Todas las sesiones del grupo 5A cumplen las restricciones obligatorias.</p></div>`;
+  }
+}
+function abrirDetalle() {
+  const c = D.conflicto;
+  document.getElementById("causa").textContent =
+    `El docente ${c.docente} está asignado a ${c.sesion.asignatura} (grupo 5A) y a ${c.otra.asignatura} (grupo ${c.otra.grupo}) el ${DIAS[c.dia].toLowerCase()} de ${rango(c.inicio)}. Un docente no puede dictar dos clases al mismo tiempo.`;
+  document.getElementById("involucradas").innerHTML = [
+    [c.sesion.asignatura, "5A", c.sesion.aula], [c.otra.asignatura, c.otra.grupo, c.otra.aula]
+  ].map(([a, g, au]) => `<div class="inv"><div class="tag">${c.docente} · ${DIAS[c.dia]} ${rango(c.inicio)}</div><strong>${a}</strong><div class="muted">Grupo ${g} · Aula ${au}</div></div>`).join("");
+  document.getElementById("mover").innerHTML =
+    `<option value="a">${c.sesion.asignatura} – grupo 5A</option><option value="b" disabled>${c.otra.asignatura} – grupo ${c.otra.grupo} (no disponible en el prototipo)</option>`;
+  const opts = D.opciones.slice().sort((x, y) => x.dia - y.dia || x.inicio - y.inicio);
+  document.getElementById("franja").innerHTML = `<option value="">Seleccione una franja…</option>` +
+    opts.map((o, i) => `<option value="${D.opciones.indexOf(o)}">${DIAS[o.dia]} de ${rango(o.inicio)}</option>`).join("");
+  document.getElementById("veredicto").innerHTML = "";
+  document.getElementById("pend").hidden = false;
+  vista("v-detalle");
+}
+document.getElementById("franja").onchange = e => {
+  document.getElementById("veredicto").innerHTML = "";
+  document.getElementById("pend").hidden = false;
+  if (e.target.value !== "") { const o = D.opciones[+e.target.value]; log(`Elige ${o.franja}`); }
+};
+document.getElementById("validar").onclick = () => {
+  const v = document.getElementById("franja").value;
+  const out = document.getElementById("veredicto");
+  if (v === "") { out.innerHTML = `<div class="verdict no">Seleccione una franja antes de validar.</div>`; return; }
+  const o = D.opciones[+v];
+  document.getElementById("pend").hidden = true;
+  if (!o.valida) {
+    const ids = [...new Set(o.motivos.map(m => m.id))];
+    log(`Valida ${o.franja}: RECHAZADO (${ids.join(", ")})`);
+    out.innerHTML = `<div class="verdict no" role="alert"><strong>Cambio rechazado.</strong> No se puede mover la clase al ${DIAS[o.dia].toLowerCase()} de ${rango(o.inicio)}:
+      <ul>${ids.map(i => `<li>${(MOTIVO[i] || (() => "Incumple una regla obligatoria."))()}</li>`).join("")}</ul>Elija otra franja.</div>`;
+    return;
+  }
+  log(`Valida ${o.franja}: ACEPTADO`);
+  nueva = D.conflicto.sesion.id;
+  document.getElementById("exito-txt").textContent =
+    `${D.conflicto.sesion.asignatura} quedaría el ${DIAS[o.dia].toLowerCase()} de ${rango(o.inicio)} en el aula ${o.aula}. No se detectaron conflictos.`;
+  document.getElementById("guardar").dataset.op = v;
+  vista("v-exito");
+};
+document.getElementById("guardar").onclick = e => {
+  const o = D.opciones[+e.target.dataset.op];
+  const s = sesiones.find(x => x.sesion === D.conflicto.sesion.id);
+  s.dia = o.dia; s.inicio = o.inicio; s.aula = o.aula; s.conflicto = false;
+  resuelto = true; log("Guarda el horario: tarea completada");
+  pintarTabla(); vista("v-horario");
+};
+for (const id of ["volver", "cancelar"]) document.getElementById(id).onclick = () => { log("Vuelve al horario"); vista("v-horario"); };
+document.getElementById("cancelar2").onclick = () => { log("Cancela en la confirmación"); nueva = null; abrirDetalle(); };
+
+function reiniciar() { sesiones = D.sesiones.map(s => ({ ...s })); resuelto = false; nueva = null; pintarTabla(); vista("v-horario"); }
+document.getElementById("reiniciar").onclick = () => { reiniciar(); log("Prototipo reiniciado"); };
+document.getElementById("iniciar").onclick = () => {
+  reiniciar(); eventos = []; t0 = performance.now();
+  for (const c of ["c1", "c2", "c3", "c4"]) document.getElementById(c).checked = false;
+  document.getElementById("obs").value = "";
+  log(`Inicio del recorrido ${document.getElementById("part").value}`);
+  clearInterval(tick);
+  tick = setInterval(() => { const s = Math.floor((performance.now() - t0) / 1000);
+    document.getElementById("reloj").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; }, 500);
+};
+function resumen() {
+  const ck = id => document.getElementById(id).checked ? "sí" : "no";
+  return [`Participante: ${document.getElementById("part").value}`, `Duración: ${document.getElementById("reloj").textContent}`,
+    `Identificó la causa sin ayuda: ${ck("c1")}`, `Completó sin explicaciones: ${ck("c2")}`,
+    `Reconoció un rechazo: ${ck("c3")}`, `Pidió ayuda: ${ck("c4")}`,
+    `Observaciones: ${document.getElementById("obs").value || "—"}`, "Eventos:", ...eventos].join("\n");
+}
+document.getElementById("cerrar").onclick = () => {
+  clearInterval(tick); log("Fin del recorrido");
+  const txt = resumen();
+  try { const h = JSON.parse(localStorage.getItem("recorridos") || "[]"); h.push(txt); localStorage.setItem("recorridos", JSON.stringify(h)); } catch (e) {}
+  document.getElementById("log").textContent = txt;
+};
+document.getElementById("copiar").onclick = async () => {
+  let todo = resumen();
+  try { const h = JSON.parse(localStorage.getItem("recorridos") || "[]"); if (h.length) todo = h.join("\n\n---\n\n"); } catch (e) {}
+  const pre = document.getElementById("log"); pre.textContent = todo;
+  try { await navigator.clipboard.writeText(todo); document.getElementById("copiar").textContent = "Resultados copiados"; }
+  catch (e) { const r = document.createRange(); r.selectNodeContents(pre); const s = getSelection(); s.removeAllRanges(); s.addRange(r); document.getElementById("copiar").textContent = "Texto seleccionado: cópielo"; }
+};
+pintarTabla();
+</script>
