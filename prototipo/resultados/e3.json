@@ -1,0 +1,43 @@
+[
+  {
+    "caso": "I1 docente sin franjas",
+    "validacion": "v2",
+    "resultado": "datos_invalidos",
+    "segundos": 0.1,
+    "retrocesos": 0,
+    "diagnostico": [
+      "[RD-02, RD-09] El docente D06 debe dictar 11 sesiones pero solo tiene 4 franjas disponibles"
+    ]
+  },
+  {
+    "caso": "I2 grupo 7A nocturno",
+    "validacion": "v1",
+    "resultado": "limite_tiempo",
+    "segundos": 60.0,
+    "retrocesos": 29098,
+    "diagnostico": [
+      "[RD-02] docente DX1: bloqueó 22463 intentos de asignación",
+      "[RD-01] aulas: bloqueó 3209 intentos de asignación"
+    ]
+  },
+  {
+    "caso": "I2 grupo 7A nocturno",
+    "validacion": "v2",
+    "resultado": "datos_invalidos",
+    "segundos": 0.15,
+    "retrocesos": 0,
+    "diagnostico": [
+      "[RD-03, RD-09] El grupo 7A tiene 14 sesiones con los docentes DX1, DX2, pero entre todos solo están disponibles en 10 franjas"
+    ]
+  },
+  {
+    "caso": "I3 un solo laboratorio (2x)",
+    "validacion": "v2",
+    "resultado": "datos_invalidos",
+    "segundos": 0.45,
+    "retrocesos": 0,
+    "diagnostico": [
+      "[RD-01, RD-07] Hay 60 sesiones que requieren computadores y solo 32 cupos aula-franja"
+    ]
+  }
+]

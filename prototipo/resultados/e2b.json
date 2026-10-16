@@ -1,0 +1,122 @@
+[
+  {
+    "escala": 2.0,
+    "semilla": 1,
+    "ocupacion_aulas_pct": 65.6,
+    "modo": "MRV+FC",
+    "resultado": "factible",
+    "segundos": 0.33,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "escala": 2.0,
+    "semilla": 1,
+    "ocupacion_aulas_pct": 65.6,
+    "modo": "cronologico",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 426063,
+    "violaciones": null
+  },
+  {
+    "escala": 2.0,
+    "semilla": 2,
+    "ocupacion_aulas_pct": 65.6,
+    "modo": "MRV+FC",
+    "resultado": "factible",
+    "segundos": 0.34,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "escala": 2.0,
+    "semilla": 2,
+    "ocupacion_aulas_pct": 65.6,
+    "modo": "cronologico",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 426458,
+    "violaciones": null
+  },
+  {
+    "escala": 2.0,
+    "semilla": 3,
+    "ocupacion_aulas_pct": 65.6,
+    "modo": "MRV+FC",
+    "resultado": "factible",
+    "segundos": 0.45,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "escala": 2.0,
+    "semilla": 3,
+    "ocupacion_aulas_pct": 65.6,
+    "modo": "cronologico",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 426584,
+    "violaciones": null
+  },
+  {
+    "escala": 2.5,
+    "semilla": 1,
+    "ocupacion_aulas_pct": 82.0,
+    "modo": "MRV+FC",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 22826,
+    "violaciones": null
+  },
+  {
+    "escala": 2.5,
+    "semilla": 1,
+    "ocupacion_aulas_pct": 82.0,
+    "modo": "cronologico",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 398225,
+    "violaciones": null
+  },
+  {
+    "escala": 2.5,
+    "semilla": 2,
+    "ocupacion_aulas_pct": 82.0,
+    "modo": "MRV+FC",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 21594,
+    "violaciones": null
+  },
+  {
+    "escala": 2.5,
+    "semilla": 2,
+    "ocupacion_aulas_pct": 82.0,
+    "modo": "cronologico",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 399526,
+    "violaciones": null
+  },
+  {
+    "escala": 2.5,
+    "semilla": 3,
+    "ocupacion_aulas_pct": 82.0,
+    "modo": "MRV+FC",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 20406,
+    "violaciones": null
+  },
+  {
+    "escala": 2.5,
+    "semilla": 3,
+    "ocupacion_aulas_pct": 82.0,
+    "modo": "cronologico",
+    "resultado": "limite_tiempo",
+    "segundos": 30.0,
+    "retrocesos": 415338,
+    "violaciones": null
+  }
+]

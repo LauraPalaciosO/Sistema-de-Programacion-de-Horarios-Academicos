@@ -1,0 +1,53 @@
+[
+ {
+  "escala": 1.0,
+  "factibles": 10,
+  "corridas": 10,
+  "violaciones": 0,
+  "t_media": 0.117,
+  "t_mediana": 0.117,
+  "t_max": 0.133,
+  "nota": "violaciones de RD-01..RD-11 (RD-13 desactivada en esta corrida)"
+ },
+ {
+  "escala": 2.0,
+  "factibles": 10,
+  "corridas": 10,
+  "violaciones": 0,
+  "t_media": 0.512,
+  "t_mediana": 0.512,
+  "t_max": 0.555,
+  "nota": "violaciones de RD-01..RD-11 (RD-13 desactivada en esta corrida)"
+ },
+ {
+  "escala": 4.0,
+  "factibles": 9,
+  "corridas": 10,
+  "violaciones": 0,
+  "t_media": 5.241,
+  "t_mediana": 2.473,
+  "t_max": 30.045,
+  "nota": "violaciones de RD-01..RD-11 (RD-13 desactivada en esta corrida)"
+ },
+ {
+  "escala": 1.0,
+  "perfil": true,
+  "fc": 14.7,
+  "dominio": 45.4,
+  "validacion": 23.3
+ },
+ {
+  "escala": 2.0,
+  "perfil": true,
+  "fc": 23.7,
+  "dominio": 40.3,
+  "validacion": 20.7
+ },
+ {
+  "escala": 4.0,
+  "perfil": true,
+  "fc": 37.6,
+  "dominio": 32.9,
+  "validacion": 16.0
+ }
+]

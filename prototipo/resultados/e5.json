@@ -1,0 +1,32 @@
+[
+  {
+    "escala": 1.0,
+    "sesiones": 84,
+    "t_perfilado_s": 0.52,
+    "pct_forward_checking": 31.5,
+    "pct_dominio_inicial": 35.8,
+    "pct_validacion_entrada": 19.6,
+    "pct_orden_valores": 2.8,
+    "llamadas_permite": 155305
+  },
+  {
+    "escala": 2.0,
+    "sesiones": 168,
+    "t_perfilado_s": 3.03,
+    "pct_forward_checking": 48.8,
+    "pct_dominio_inicial": 28.5,
+    "pct_validacion_entrada": 12.6,
+    "pct_orden_valores": 2.0,
+    "llamadas_permite": 777543
+  },
+  {
+    "escala": 4.0,
+    "sesiones": 336,
+    "t_perfilado_s": 10.06,
+    "pct_forward_checking": 43.6,
+    "pct_dominio_inicial": 33.8,
+    "pct_validacion_entrada": 18.2,
+    "pct_orden_valores": 0.2,
+    "llamadas_permite": 2697041
+  }
+]

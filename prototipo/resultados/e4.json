@@ -1,0 +1,22 @@
+[
+  {
+    "escala": 1.0,
+    "validacion_ms_media": 0.01,
+    "validacion_ms_max": 0.046,
+    "movimientos_rechazados_pct": 84.8,
+    "alternativas_ms_media": 2.9,
+    "alternativas_ms_max": 3.4,
+    "alternativas_validas_media": 22.9,
+    "sesiones_sin_alternativas": 0
+  },
+  {
+    "escala": 2.0,
+    "validacion_ms_media": 0.012,
+    "validacion_ms_max": 0.052,
+    "movimientos_rechazados_pct": 87.0,
+    "alternativas_ms_media": 7.6,
+    "alternativas_ms_max": 12.4,
+    "alternativas_validas_media": 25.8,
+    "sesiones_sin_alternativas": 0
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "semilla": 1,
+    "resultado": "factible",
+    "segundos": 0.31,
+    "nodos": 84,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "semilla": 2,
+    "resultado": "factible",
+    "segundos": 0.36,
+    "nodos": 84,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "semilla": 3,
+    "resultado": "factible",
+    "segundos": 0.3,
+    "nodos": 84,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "semilla": 4,
+    "resultado": "factible",
+    "segundos": 0.29,
+    "nodos": 84,
+    "retrocesos": 0,
+    "violaciones": 0
+  },
+  {
+    "semilla": 5,
+    "resultado": "factible",
+    "segundos": 0.3,
+    "nodos": 84,
+    "retrocesos": 0,
+    "violaciones": 0
+  }
+]

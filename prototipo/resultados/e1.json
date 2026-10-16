@@ -1,0 +1,50 @@
+[
+  {
+    "escala": 1.0,
+    "sesiones": 84,
+    "docentes": 12,
+    "aulas": 8,
+    "secciones": 44,
+    "corridas": 10,
+    "factibles": 10,
+    "violaciones_duras_verificador": 0,
+    "t_media_s": 0.144,
+    "t_p95_s": 0.176,
+    "t_max_s": 0.176,
+    "retrocesos_max": 0,
+    "rb01_pares_consecutivos_media": 0.3,
+    "rb02_pct_preferidas_media": 96.5
+  },
+  {
+    "escala": 2.0,
+    "sesiones": 168,
+    "docentes": 24,
+    "aulas": 16,
+    "secciones": 88,
+    "corridas": 10,
+    "factibles": 10,
+    "violaciones_duras_verificador": 0,
+    "t_media_s": 0.736,
+    "t_p95_s": 0.769,
+    "t_max_s": 0.769,
+    "retrocesos_max": 0,
+    "rb01_pares_consecutivos_media": 0.7,
+    "rb02_pct_preferidas_media": 96.7
+  },
+  {
+    "escala": 4.0,
+    "sesiones": 336,
+    "docentes": 48,
+    "aulas": 32,
+    "secciones": 176,
+    "corridas": 10,
+    "factibles": 9,
+    "violaciones_duras_verificador": 0,
+    "t_media_s": 7.172,
+    "t_p95_s": 30.06,
+    "t_max_s": 30.06,
+    "retrocesos_max": 6135,
+    "rb01_pares_consecutivos_media": 2.22,
+    "rb02_pct_preferidas_media": 96.3
+  }
+]

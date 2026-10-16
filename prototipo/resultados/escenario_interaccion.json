@@ -1,0 +1,599 @@
+{
+ "grupo": "5A",
+ "sesiones": [
+  {
+   "sesion": "5-01A#1",
+   "asignatura": "Bases de Datos",
+   "seccion": "5-01A",
+   "docente": "D01",
+   "aula": "S101",
+   "dia": 0,
+   "inicio": 7,
+   "conflicto": true
+  },
+  {
+   "sesion": "5-05A#1",
+   "asignatura": "Probabilidad y Estadística",
+   "seccion": "5-05A",
+   "docente": "D05",
+   "aula": "S103",
+   "dia": 0,
+   "inicio": 13,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-04A#2",
+   "asignatura": "Sistemas Operativos",
+   "seccion": "5-04A",
+   "docente": "D04",
+   "aula": "LAB2",
+   "dia": 0,
+   "inicio": 17,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-03A#2",
+   "asignatura": "Algoritmos y Complejidad",
+   "seccion": "5-03A",
+   "docente": "D03",
+   "aula": "S103",
+   "dia": 0,
+   "inicio": 19,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-01A#3",
+   "asignatura": "Bases de Datos",
+   "seccion": "5-01A",
+   "docente": "D01",
+   "aula": "S101",
+   "dia": 1,
+   "inicio": 7,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-02A#1",
+   "asignatura": "Programación Avanzada",
+   "seccion": "5-02A",
+   "docente": "D02",
+   "aula": "LAB2",
+   "dia": 1,
+   "inicio": 15,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-05A#2",
+   "asignatura": "Probabilidad y Estadística",
+   "seccion": "5-05A",
+   "docente": "D05",
+   "aula": "S101",
+   "dia": 2,
+   "inicio": 13,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-06A#1",
+   "asignatura": "Ingeniería de Software I",
+   "seccion": "5-06A",
+   "docente": "D06",
+   "aula": "S202",
+   "dia": 2,
+   "inicio": 17,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-02A#2",
+   "asignatura": "Programación Avanzada",
+   "seccion": "5-02A",
+   "docente": "D02",
+   "aula": "LAB2",
+   "dia": 3,
+   "inicio": 13,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-07A#1",
+   "asignatura": "Ética Profesional",
+   "seccion": "5-07A",
+   "docente": "D07",
+   "aula": "S202",
+   "dia": 4,
+   "inicio": 9,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-03A#1",
+   "asignatura": "Algoritmos y Complejidad",
+   "seccion": "5-03A",
+   "docente": "D03",
+   "aula": "S202",
+   "dia": 4,
+   "inicio": 15,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-06A#2",
+   "asignatura": "Ingeniería de Software I",
+   "seccion": "5-06A",
+   "docente": "D06",
+   "aula": "S202",
+   "dia": 4,
+   "inicio": 17,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-04A#1",
+   "asignatura": "Sistemas Operativos",
+   "seccion": "5-04A",
+   "docente": "D04",
+   "aula": "LAB3",
+   "dia": 4,
+   "inicio": 19,
+   "conflicto": false
+  },
+  {
+   "sesion": "5-01A#2",
+   "asignatura": "Bases de Datos",
+   "seccion": "5-01A",
+   "docente": "D01",
+   "aula": "S202",
+   "dia": 5,
+   "inicio": 7,
+   "conflicto": false
+  }
+ ],
+ "conflicto": {
+  "restriccion": "RD-02",
+  "texto": "Un docente no puede tener dos sesiones simultáneas",
+  "docente": "D01",
+  "franja": "Lun 07-09",
+  "dia": 0,
+  "inicio": 7,
+  "sesion": {
+   "id": "5-01A#1",
+   "asignatura": "Bases de Datos",
+   "seccion": "5-01A",
+   "aula": "S101"
+  },
+  "otra": {
+   "id": "6-06A#1",
+   "asignatura": "Interacción Humano-Computador",
+   "seccion": "6-06A",
+   "grupo": "6A",
+   "aula": "S201"
+  },
+  "franja_original": "Jue 07-09"
+ },
+ "opciones": [
+  {
+   "franja": "Lun 09-11",
+   "dia": 0,
+   "inicio": 9,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-02",
+     "texto": "Un docente no puede tener dos sesiones simultáneas",
+     "recurso": "docente D01"
+    }
+   ]
+  },
+  {
+   "franja": "Lun 13-15",
+   "dia": 0,
+   "inicio": 13,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Lun 15-17",
+   "dia": 0,
+   "inicio": 15,
+   "valida": true,
+   "aula": "S201",
+   "motivos": []
+  },
+  {
+   "franja": "Lun 17-19",
+   "dia": 0,
+   "inicio": 17,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-09",
+     "texto": "El docente debe estar disponible en la franja",
+     "recurso": "docente D01"
+    },
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Lun 19-21",
+   "dia": 0,
+   "inicio": 19,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Mar 07-09",
+   "dia": 1,
+   "inicio": 7,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-02",
+     "texto": "Un docente no puede tener dos sesiones simultáneas",
+     "recurso": "docente D01"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Mar 09-11",
+   "dia": 1,
+   "inicio": 9,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-09",
+     "texto": "El docente debe estar disponible en la franja",
+     "recurso": "docente D01"
+    }
+   ]
+  },
+  {
+   "franja": "Mar 13-15",
+   "dia": 1,
+   "inicio": 13,
+   "valida": true,
+   "aula": "S201",
+   "motivos": []
+  },
+  {
+   "franja": "Mar 15-17",
+   "dia": 1,
+   "inicio": 15,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Mar 17-19",
+   "dia": 1,
+   "inicio": 17,
+   "valida": true,
+   "aula": "S201",
+   "motivos": []
+  },
+  {
+   "franja": "Mar 19-21",
+   "dia": 1,
+   "inicio": 19,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Mié 07-09",
+   "dia": 2,
+   "inicio": 7,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-02",
+     "texto": "Un docente no puede tener dos sesiones simultáneas",
+     "recurso": "docente D01"
+    }
+   ]
+  },
+  {
+   "franja": "Mié 09-11",
+   "dia": 2,
+   "inicio": 9,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-02",
+     "texto": "Un docente no puede tener dos sesiones simultáneas",
+     "recurso": "docente D01"
+    }
+   ]
+  },
+  {
+   "franja": "Mié 13-15",
+   "dia": 2,
+   "inicio": 13,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Mié 15-17",
+   "dia": 2,
+   "inicio": 15,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Mié 17-19",
+   "dia": 2,
+   "inicio": 17,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-09",
+     "texto": "El docente debe estar disponible en la franja",
+     "recurso": "docente D01"
+    },
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Mié 19-21",
+   "dia": 2,
+   "inicio": 19,
+   "valida": true,
+   "aula": "S201",
+   "motivos": []
+  },
+  {
+   "franja": "Jue 07-09",
+   "dia": 3,
+   "inicio": 7,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Jue 09-11",
+   "dia": 3,
+   "inicio": 9,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Jue 13-15",
+   "dia": 3,
+   "inicio": 13,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Jue 15-17",
+   "dia": 3,
+   "inicio": 15,
+   "valida": true,
+   "aula": "S201",
+   "motivos": []
+  },
+  {
+   "franja": "Jue 17-19",
+   "dia": 3,
+   "inicio": 17,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Jue 19-21",
+   "dia": 3,
+   "inicio": 19,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Vie 07-09",
+   "dia": 4,
+   "inicio": 7,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Vie 09-11",
+   "dia": 4,
+   "inicio": 9,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Vie 13-15",
+   "dia": 4,
+   "inicio": 13,
+   "valida": true,
+   "aula": "S101",
+   "motivos": []
+  },
+  {
+   "franja": "Vie 15-17",
+   "dia": 4,
+   "inicio": 15,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Vie 17-19",
+   "dia": 4,
+   "inicio": 17,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-09",
+     "texto": "El docente debe estar disponible en la franja",
+     "recurso": "docente D01"
+    },
+    {
+     "id": "RD-01",
+     "texto": "Un aula no puede tener dos sesiones simultáneas",
+     "recurso": "aulas"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Vie 19-21",
+   "dia": 4,
+   "inicio": 19,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Sáb 07-09",
+   "dia": 5,
+   "inicio": 7,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-02",
+     "texto": "Un docente no puede tener dos sesiones simultáneas",
+     "recurso": "docente D01"
+    },
+    {
+     "id": "RD-03",
+     "texto": "Un grupo no puede tener dos asignaturas simultáneas",
+     "recurso": "grupo 5A"
+    }
+   ]
+  },
+  {
+   "franja": "Sáb 09-11",
+   "dia": 5,
+   "inicio": 9,
+   "valida": false,
+   "aula": "S101",
+   "motivos": [
+    {
+     "id": "RD-09",
+     "texto": "El docente debe estar disponible en la franja",
+     "recurso": "docente D01"
+    }
+   ]
+  }
+ ],
+ "resumen": {
+  "validas": 13,
+  "total": 31
+ }
+}

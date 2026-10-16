@@ -1,0 +1,26 @@
+[
+ {
+  "escala": 1.0,
+  "factibles": 10,
+  "corridas": 10,
+  "violaciones": 0,
+  "t_media": 0.934,
+  "t_max": 1.114,
+  "rb01_media": 0
+ },
+ {
+  "escala": 2.0,
+  "factibles": 10,
+  "corridas": 10,
+  "violaciones": 0,
+  "t_media": 8.891,
+  "t_max": 11.612,
+  "rb01_media": 0
+ },
+ {
+  "cambio": "tope 35",
+  "secciones_excedidas": 9,
+  "maximo": 38,
+  "ejemplo": "La sección 5-01A tiene 40 estudiantes (máximo 38)"
+ }
+]
