@@ -1,0 +1,182 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam packageStyle rectangle
+skinparam linetype polyline
+skinparam nodesep 25
+skinparam ranksep 40
+hide empty members
+
+package "Dominio" {
+  class Instancia {
+    +nombre: str
+    +sesiones(): List<Sesion>
+  }
+  class Parametros {
+    +tamanoObjetivo: int = 40
+    +tolerancia: float = 0.10
+    +minimoEstudiantes: int = 10
+    +sesionesMin: int = 1
+    +sesionesMax: int = 4
+    +tamanoMaximo(): int
+  }
+  class Franja {
+    +id: int
+    +dia: int
+    +inicio: int
+    +fin(): int
+  }
+  class Aula {
+    +id: str
+    +capacidad: int
+    +caracteristicas: Set<str>
+  }
+  class Docente {
+    +id: str
+    +habilitadas: Set<str>
+    +disponibles: Set<int>
+    +preferidas: Set<int>
+  }
+  class Asignatura {
+    +codigo: str
+    +semestre: int
+    +creditos: int
+    +sesionesSemanales: int
+    +requisitos: Set<str>
+  }
+  class Seccion {
+    +id: str
+    +grupo: str
+    +estudiantes: int
+  }
+  class Sesion {
+    +id: str
+    +indice: int
+  }
+}
+
+package "Reglas" {
+  abstract class Restriccion {
+    +id: str
+    +descripcion: str
+    +recurso(s: Sesion): str
+  }
+  abstract class RestriccionUnaria {
+    +{abstract} permite(s, f, a, inst): bool
+  }
+  abstract class RestriccionRelacional {
+    +{abstract} permite(s, f, a, estado): bool
+    +afecta(f: Franja, inst): List<int>
+    +relacionadas(s, pendientes): List<Sesion>
+  }
+  class FranjaInstitucional
+  class CapacidadAula
+  class CaracteristicasAula
+  class DisponibilidadDocente
+  class AulaLibre
+  class DocenteLibre
+  class GrupoLibre
+  class DiasNoConsecutivos <<prueba de cambio>>
+  class RegistroRestricciones {
+    +restriccionesDuras(): List<Restriccion>
+  }
+}
+
+package "Motor" {
+  interface Solver <<Strategy>> {
+    +resolver(inst: Instancia): Resultado
+  }
+  class BacktrackingSolver {
+    -mrv: bool
+    -forwardChecking: bool
+    -limiteSegundos: float
+    -elegir(): Sesion
+    -propagar(s, f): bool
+    -explicar(): List<str>
+  }
+  class CPSATSolver <<propuesto>>
+  class ServicioProgramacion <<propuesto>> {
+    -solver: Solver
+    +generar(inst): Resultado
+    +cambiarSolver(s: Solver)
+  }
+  class Estado {
+    +asignar(s, f, a)
+    +desasignar(s)
+    +enFranja(id): List
+    +enDia(dia): List
+  }
+  class Resultado {
+    +estado: str
+    +asignacion: Map<str, (Franja, Aula)>
+    +diagnostico: List<str>
+  }
+  class ValidadorEntrada {
+    +validar(inst, reglas, version): List<Diagnostico>
+  }
+  class Diagnostico {
+    +nivel: str
+    +restricciones: List<str>
+    +mensaje: str
+  }
+}
+
+package "Edición y calidad" {
+  class Editor {
+    +validarMovimiento(sesionId, f, a): List<Falla>
+    +alternativas(sesionId, max): List<(Franja, Aula)>
+    +conflictos(): List<Falla>
+    +aplicar(sesionId, f, a)
+  }
+  class EvaluadorBlandas {
+    +evaluar(inst, asignacion): Map<str, float>
+  }
+}
+
+Instancia "1" *-- "1" Parametros
+Instancia "1" *-- "1..*" Franja
+Instancia "1" *-- "1..*" Aula
+Instancia "1" *-- "1..*" Docente
+Instancia "1" *-- "1..*" Seccion
+Seccion "1..*" --> "1" Asignatura
+Seccion "0..*" --> "1" Docente : dictada por
+Seccion "1" *-- "1..4" Sesion
+
+Restriccion <|-- RestriccionUnaria
+Restriccion <|-- RestriccionRelacional
+RestriccionUnaria <|-- FranjaInstitucional
+RestriccionUnaria <|-- CapacidadAula
+RestriccionUnaria <|-- CaracteristicasAula
+RestriccionUnaria <|-- DisponibilidadDocente
+RestriccionRelacional <|-- AulaLibre
+RestriccionRelacional <|-- DocenteLibre
+RestriccionRelacional <|-- GrupoLibre
+RestriccionRelacional <|-- DiasNoConsecutivos
+RegistroRestricciones ..> Restriccion : crea
+
+Solver <|.. BacktrackingSolver
+Solver <|.. CPSATSolver
+ServicioProgramacion o--> "1" Solver
+BacktrackingSolver --> "1..*" Restriccion : evalúa
+BacktrackingSolver *-- "1" Estado
+BacktrackingSolver ..> ValidadorEntrada : usa
+BacktrackingSolver ..> Resultado : produce
+ValidadorEntrada ..> Diagnostico : produce
+RestriccionRelacional ..> Estado : consulta
+Editor --> "1..*" Restriccion : evalúa
+Editor *-- "1" Estado
+EvaluadorBlandas ..> Resultado : puntúa
+BacktrackingSolver ..> Instancia : lee
+
+' disposición vertical: Motor arriba, Reglas y Edición al medio, Dominio abajo
+ServicioProgramacion -[hidden]down- Solver
+Diagnostico -[hidden]down- RegistroRestricciones
+Diagnostico -[hidden]down- Editor
+CapacidadAula -[hidden]down- Instancia
+GrupoLibre -[hidden]down- Instancia
+Franja -[hidden]right- Aula
+Franja -[hidden]down- Docente
+Aula -[hidden]down- Asignatura
+@enduml

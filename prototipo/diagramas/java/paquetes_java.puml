@@ -1,0 +1,48 @@
+@startuml paquetes_java
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam ArrowColor #445566
+skinparam rectangleBorderColor #445566
+title Dependencias entre paquetes (co.edu.unbosque.horarios)
+
+package controller #E8F0FE {
+  label "Recibe las peticiones HTTP (REST)" as l1
+}
+package dto #F3F6FA {
+  label "Datos que entran y salen de la API" as l2
+}
+package service #E6F4EA {
+  label "Lógica de negocio" as l3
+}
+package solver #FFF4E5 {
+  label "Motor de generación (Strategy)" as l4
+}
+package restriccion #FDECEC {
+  label "Reglas obligatorias" as l5
+}
+package repository #EDE7F6 {
+  label "Acceso a la base de datos" as l6
+}
+package model #FFFBE6 {
+  label "Entidades JPA" as l7
+}
+
+controller --> service
+controller --> dto
+service --> dto
+service --> repository
+service --> solver
+service --> restriccion
+service --> model
+solver --> restriccion
+solver --> model
+restriccion --> model
+repository --> model
+
+note right of model
+  Las dependencias van siempre hacia abajo:
+  model no depende de ningún paquete, y
+  controller solo usa service y dto.
+end note
+@enduml

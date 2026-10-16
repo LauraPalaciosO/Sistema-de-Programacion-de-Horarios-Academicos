@@ -1,0 +1,42 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam sequenceMessageAlign left
+autonumber
+actor Coordinador
+participant "Interfaz web" as UI
+participant "Editor" as ED
+participant "Estado" as ES
+collections "Restriccion\n(reglas obligatorias)" as R
+
+Coordinador -> UI : Abre el horario del grupo 5A
+UI -> ED : conflictos()
+ED --> UI : docente D01 con dos clases, Lun 07-09
+UI --> Coordinador : Celda marcada y panel\n"Conflicto detectado"
+Coordinador -> UI : Revisar
+UI -> ED : alternativas("5-01A#1")
+loop por cada franja y aula
+  ED -> ES : desasignar(sesión)
+  ED -> R : permite(sesión, franja, aula, estado)
+  R -> ES : enFranja(franja)
+  R --> ED : true / false
+  ED -> ES : asignar(sesión, valor actual)
+end
+ED --> UI : alternativas válidas ordenadas
+UI --> Coordinador : Detalle: causa, clases\ninvolucradas y franjas
+Coordinador -> UI : Elige franja y pulsa "Validar cambio"
+UI -> ED : validarMovimiento(sesión, franja, aula)
+ED -> R : permite(...) para cada regla
+alt hay restricciones incumplidas
+  ED --> UI : reglas incumplidas\n(grupo ocupado, docente no disponible)
+  UI --> Coordinador : "Cambio rechazado" y motivos\nen lenguaje del usuario
+else sin incumplimientos
+  ED --> UI : []
+  UI --> Coordinador : "Cambio validado. ¿Guardar?"
+  Coordinador -> UI : Guardar horario
+  UI -> ED : aplicar(sesión, franja, aula)
+  ED -> ES : desasignar / asignar
+  UI --> Coordinador : Horario sin conflictos
+end
+@enduml

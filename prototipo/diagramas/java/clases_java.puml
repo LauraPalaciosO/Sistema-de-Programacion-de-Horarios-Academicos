@@ -1,0 +1,408 @@
+@startuml clases_java
+' Diagrama de clases para la implementación en Java (Spring Boot) del
+' Sistema de Programación de Horarios Académicos - Grupo 1
+' Paquete base: co.edu.unbosque.horarios
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam packageStyle rectangle
+skinparam linetype polyline
+skinparam nodesep 30
+skinparam ranksep 45
+skinparam class {
+  BackgroundColor White
+  BorderColor #445566
+  ArrowColor #445566
+}
+skinparam package {
+  FontSize 14
+  FontStyle bold
+}
+hide empty members
+set separator none
+
+title Sistema de Programación de Horarios Académicos — Diagrama de clases (Java / Spring Boot)\npaquete base: co.edu.unbosque.horarios
+
+' ============================================================ CONTROLLER
+package "controller" as P_controller #E8F0FE {
+  class HorarioController <<@RestController>> {
+    - programacionService : ProgramacionService
+    + generar(req : GenerarRequest) : ResponseEntity<ResultadoDTO>
+    + obtener(id : Long, grupo : String) : ResponseEntity<HorarioDTO>
+  }
+  class EdicionController <<@RestController>> {
+    - edicionService : EdicionService
+    + conflictos(horarioId : Long) : ResponseEntity<List<ConflictoDTO>>
+    + alternativas(asignacionId : Long) : ResponseEntity<List<AlternativaDTO>>
+    + validar(req : CambioRequest) : ResponseEntity<ValidacionCambioDTO>
+    + aplicar(req : CambioRequest) : ResponseEntity<HorarioDTO>
+  }
+}
+
+' ============================================================ DTO
+package "dto" as P_dto #F3F6FA {
+  class GenerarRequest <<record>> {
+    + periodo : String
+  }
+  class ResultadoDTO <<record>> {
+    + estado : String
+    + horarioId : Long
+    + milisegundos : long
+    + mensajes : List<String>
+  }
+  class HorarioDTO <<record>> {
+    + grupo : String
+    + clases : List<ClaseDTO>
+  }
+  class ClaseDTO <<record>> {
+    + asignatura : String
+    + docente : String
+    + aula : String
+    + dia : String
+    + inicio : LocalTime
+    + enConflicto : boolean
+  }
+  class ConflictoDTO <<record>> {
+    + regla : String
+    + mensaje : String
+    + asignacionIds : List<Long>
+  }
+  class AlternativaDTO <<record>> {
+    + franjaId : Long
+    + aulaId : Long
+    + descripcion : String
+  }
+  class CambioRequest <<record>> {
+    + asignacionId : Long
+    + franjaId : Long
+    + aulaId : Long
+  }
+  class ValidacionCambioDTO <<record>> {
+    + valido : boolean
+    + motivos : List<String>
+  }
+}
+
+' ============================================================ SERVICE
+package "service" as P_service #E6F4EA {
+  interface ProgramacionService {
+    + generarHorario(periodo : String) : ResultadoDTO
+    + obtenerHorario(id : Long, grupo : String) : HorarioDTO
+  }
+  class ProgramacionServiceImpl <<@Service>> {
+    - seccionRepository : SeccionRepository
+    - docenteRepository : DocenteRepository
+    - aulaRepository : AulaRepository
+    - franjaRepository : FranjaRepository
+    - parametrosRepository : ParametrosRepository
+    - horarioRepository : HorarioRepository
+    - validacionService : ValidacionService
+    - solver : Solver
+    - mapper : HorarioMapper
+    - construirInstancia() : Instancia
+  }
+  interface ValidacionService {
+    + validarDatos(instancia : Instancia) : List<Diagnostico>
+  }
+  class ValidacionServiceImpl <<@Service>> {
+    - registro : RegistroRestricciones
+    - revisarCapacidadDocentes(inst : Instancia) : List<Diagnostico>
+    - revisarFranjasPorGrupo(inst : Instancia) : List<Diagnostico>
+  }
+  interface EdicionService {
+    + detectarConflictos(horarioId : Long) : List<ConflictoDTO>
+    + sugerirAlternativas(asignacionId : Long, max : int) : List<AlternativaDTO>
+    + validarCambio(req : CambioRequest) : ValidacionCambioDTO
+    + aplicarCambio(req : CambioRequest) : HorarioDTO
+  }
+  class EdicionServiceImpl <<@Service>> {
+    - horarioRepository : HorarioRepository
+    - franjaRepository : FranjaRepository
+    - aulaRepository : AulaRepository
+    - registro : RegistroRestricciones
+    - mapper : HorarioMapper
+  }
+  class EvaluadorPreferencias <<@Component>> {
+    + evaluar(asignaciones : List<Asignacion>) : Map<String, Double>
+  }
+  class HorarioMapper <<@Component>> {
+    + aDTO(horario : Horario, grupo : String) : HorarioDTO
+    + aResultadoDTO(r : Resultado, horarioId : Long) : ResultadoDTO
+  }
+}
+
+' ============================================================ SOLVER (Strategy)
+package "solver" as P_solver #FFF4E5 {
+  interface Solver <<Strategy>> {
+    + resolver(instancia : Instancia) : Resultado
+  }
+  class BacktrackingSolver <<@Component>> {
+    - registro : RegistroRestricciones
+    - limiteMilisegundos : long
+    - elegirSesion(pendientes : List<Sesion>) : Sesion
+    - ordenarValores(s : Sesion) : List<Valor>
+    - propagar(s : Sesion, f : Franja) : boolean
+    - buscar() : boolean
+  }
+  class CpSatSolver <<propuesto>>
+  class Instancia {
+    - sesiones : List<Sesion>
+    - franjas : List<Franja>
+    - aulas : List<Aula>
+    - docentes : Map<Long, Docente>
+    - parametros : ParametrosInstitucionales
+  }
+  class EstadoBusqueda {
+    + asignar(s : Sesion, f : Franja, a : Aula) : void
+    + desasignar(s : Sesion) : void
+    + enFranja(f : Franja) : List<Asignacion>
+    + enDia(d : DiaSemana) : List<Asignacion>
+  }
+  class Resultado {
+    - estado : EstadoResultado
+    - asignaciones : List<Asignacion>
+    - diagnosticos : List<Diagnostico>
+    - milisegundos : long
+  }
+  enum EstadoResultado {
+    FACTIBLE
+    SIN_SOLUCION
+    LIMITE_TIEMPO
+    DATOS_INVALIDOS
+  }
+  class Diagnostico {
+    - regla : String
+    - mensaje : String
+    - elementos : List<String>
+  }
+}
+
+' ============================================================ RESTRICCION
+package "restriccion" as P_restriccion #FDECEC {
+  interface Restriccion {
+    + getNombre() : String
+    + describirRecurso(s : Sesion) : String
+  }
+  abstract class RestriccionUnaria {
+    + {abstract} permite(s : Sesion, f : Franja, a : Aula, inst : Instancia) : boolean
+  }
+  abstract class RestriccionRelacional {
+    + {abstract} permite(s : Sesion, f : Franja, a : Aula, e : EstadoBusqueda) : boolean
+    + afecta(f : Franja, inst : Instancia) : List<Franja>
+    + relacionadas(s : Sesion, pendientes : List<Sesion>) : List<Sesion>
+  }
+  class RegistroRestricciones <<@Component>> {
+    - activas : List<Restriccion>
+    + getUnarias() : List<RestriccionUnaria>
+    + getRelacionales() : List<RestriccionRelacional>
+  }
+  class FranjaInstitucional <<@Component>>
+  class CapacidadAula <<@Component>>
+  class CaracteristicasAula <<@Component>>
+  class DisponibilidadDocente <<@Component>>
+  class AulaLibre <<@Component>>
+  class DocenteLibre <<@Component>>
+  class GrupoLibre <<@Component>>
+  class DiasNoConsecutivos <<prueba de cambio>>
+}
+
+' ============================================================ REPOSITORY
+package "repository" as P_repository #EDE7F6 {
+  interface "JpaRepository<T, ID>" as JpaRepository <<Spring Data>> {
+    + save(entidad : T) : T
+    + findById(id : ID) : Optional<T>
+    + findAll() : List<T>
+    + deleteById(id : ID) : void
+  }
+  interface AsignaturaRepository <<@Repository>> {
+    + findBySemestre(semestre : int) : List<Asignatura>
+  }
+  interface SeccionRepository <<@Repository>> {
+    + findByAsignaturaSemestreIn(semestres : List<Integer>) : List<Seccion>
+  }
+  interface DocenteRepository <<@Repository>>
+  interface AulaRepository <<@Repository>>
+  interface FranjaRepository <<@Repository>> {
+    + findAllByOrderByDiaAscInicioAsc() : List<Franja>
+  }
+  interface HorarioRepository <<@Repository>> {
+    + findTopByOrderByGeneradoEnDesc() : Optional<Horario>
+  }
+  interface ParametrosRepository <<@Repository>>
+}
+
+' ============================================================ MODEL
+package "model" as P_model #FFFBE6 {
+  class Asignatura <<@Entity>> {
+    - id : Long
+    - codigo : String
+    - nombre : String
+    - semestre : int
+    - creditos : int
+    - sesionesSemanales : int
+    - requisitosAula : Set<String>
+  }
+  class Seccion <<@Entity>> {
+    - id : Long
+    - codigo : String
+    - grupo : String
+    - estudiantes : int
+    + generarSesiones() : List<Sesion>
+  }
+  class Sesion {
+    - seccion : Seccion
+    - indice : int
+  }
+  class Docente <<@Entity>> {
+    - id : Long
+    - nombre : String
+    + puedeDictar(a : Asignatura) : boolean
+    + estaDisponible(f : Franja) : boolean
+  }
+  class Aula <<@Entity>> {
+    - id : Long
+    - codigo : String
+    - capacidad : int
+    - caracteristicas : Set<String>
+    + cumple(requisitos : Set<String>) : boolean
+  }
+  class Franja <<@Entity>> {
+    - id : Long
+    - dia : DiaSemana
+    - inicio : LocalTime
+    - fin : LocalTime
+  }
+  enum DiaSemana {
+    LUNES
+    MARTES
+    MIERCOLES
+    JUEVES
+    VIERNES
+    SABADO
+  }
+  class Horario <<@Entity>> {
+    - id : Long
+    - periodo : String
+    - generadoEn : LocalDateTime
+    - estado : EstadoHorario
+  }
+  enum EstadoHorario {
+    BORRADOR
+    PUBLICADO
+  }
+  class Asignacion <<@Entity>> {
+    - id : Long
+    - indiceSesion : int
+  }
+  class ParametrosInstitucionales <<@Entity>> {
+    - id : Long
+    - tamanoObjetivo : int = 40
+    - tolerancia : double = 0.10
+    - minimoEstudiantes : int = 10
+    - sesionesMin : int = 1
+    - sesionesMax : int = 4
+    + tamanoMaximo() : int
+  }
+}
+
+' ============================================================ RELACIONES
+' controller -> service
+HorarioController --> ProgramacionService
+EdicionController --> EdicionService
+HorarioController ..> GenerarRequest
+EdicionController ..> CambioRequest
+
+' service
+ProgramacionService <|.. ProgramacionServiceImpl
+ValidacionService <|.. ValidacionServiceImpl
+EdicionService <|.. EdicionServiceImpl
+ProgramacionServiceImpl --> ValidacionService
+ProgramacionServiceImpl --> "1" Solver : usa (Strategy)
+ProgramacionServiceImpl --> HorarioMapper
+EdicionServiceImpl --> HorarioMapper
+ProgramacionServiceImpl ..> EvaluadorPreferencias
+HorarioMapper ..> HorarioDTO : crea
+HorarioMapper ..> ResultadoDTO : crea
+HorarioDTO *-- "0..*" ClaseDTO
+
+' service -> repository
+ProgramacionServiceImpl --> SeccionRepository
+ProgramacionServiceImpl --> DocenteRepository
+ProgramacionServiceImpl --> AulaRepository
+ProgramacionServiceImpl --> FranjaRepository
+ProgramacionServiceImpl --> ParametrosRepository
+ProgramacionServiceImpl --> HorarioRepository
+EdicionServiceImpl --> HorarioRepository
+
+' service -> restriccion
+ValidacionServiceImpl --> RegistroRestricciones
+EdicionServiceImpl --> RegistroRestricciones
+
+' solver (Strategy)
+Solver <|.. BacktrackingSolver
+Solver <|.. CpSatSolver
+BacktrackingSolver --> RegistroRestricciones
+BacktrackingSolver *-- "1" EstadoBusqueda
+BacktrackingSolver ..> Resultado : produce
+Resultado --> EstadoResultado
+Resultado o-- "0..*" Diagnostico
+Instancia o-- "1..*" Sesion
+
+' restriccion
+Restriccion <|.. RestriccionUnaria
+Restriccion <|.. RestriccionRelacional
+RegistroRestricciones o-- "1..*" Restriccion
+RestriccionUnaria <|-- FranjaInstitucional
+RestriccionUnaria <|-- CapacidadAula
+RestriccionUnaria <|-- CaracteristicasAula
+RestriccionUnaria <|-- DisponibilidadDocente
+RestriccionRelacional <|-- AulaLibre
+RestriccionRelacional <|-- DocenteLibre
+RestriccionRelacional <|-- GrupoLibre
+RestriccionRelacional <|-- DiasNoConsecutivos
+RestriccionRelacional ..> EstadoBusqueda : consulta
+
+' repository
+JpaRepository <|-- AsignaturaRepository : <Asignatura, Long>
+JpaRepository <|-- SeccionRepository : <Seccion, Long>
+JpaRepository <|-- DocenteRepository : <Docente, Long>
+JpaRepository <|-- AulaRepository : <Aula, Long>
+JpaRepository <|-- FranjaRepository : <Franja, Long>
+JpaRepository <|-- HorarioRepository : <Horario, Long>
+JpaRepository <|-- ParametrosRepository : <ParametrosInstitucionales, Long>
+
+' model
+Seccion "0..*" --> "1" Asignatura
+Seccion "0..*" --> "1" Docente : dictada por
+Seccion "1" ..> "1..4" Sesion : genera
+Docente "0..*" --> "1..*" Asignatura : habilitado para
+Docente "0..*" --> "0..*" Franja : disponibles
+Franja --> DiaSemana
+Horario "1" *-- "0..*" Asignacion
+Horario --> EstadoHorario
+Asignacion "0..*" --> "1" Seccion
+Asignacion "0..*" --> "1" Franja
+Asignacion "0..*" --> "1" Aula
+
+' orden vertical de las capas: controller/dto -> service -> repository / solver / restriccion -> model
+P_controller -[hidden]right- P_dto
+P_controller -[hidden]down- P_service
+P_dto -[hidden]down- P_service
+P_service -[hidden]down- P_repository
+P_service -[hidden]down- P_solver
+P_service -[hidden]down- P_restriccion
+P_repository -[hidden]down- P_model
+P_solver -[hidden]down- P_model
+
+legend bottom left
+  <b>Cómo leerlo</b>
+  Cada paquete es una capa: controller recibe las peticiones HTTP, service contiene la lógica,
+  repository accede a la base de datos y model define las entidades JPA.
+  solver contiene el motor de generación (patrón Strategy) y restriccion las reglas obligatorias.
+  Solo RegistroRestricciones conoce las reglas concretas: Spring inyecta todas las clases
+  @Component que heredan de Restriccion, así que agregar una regla es agregar una clase.
+  «propuesto»: aún no implementado. Flecha continua: asociación; punteada: dependencia o uso.
+endlegend
+@enduml

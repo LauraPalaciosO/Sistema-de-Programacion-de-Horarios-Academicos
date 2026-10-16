@@ -1,0 +1,134 @@
+@startuml entidades_java
+' Modelo de entidades JPA - Sistema de Programación de Horarios Académicos (Grupo 1)
+' Paquete: co.edu.unbosque.horarios.model
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam linetype polyline
+skinparam nodesep 60
+skinparam ranksep 70
+skinparam class {
+  BackgroundColor White
+  BorderColor #445566
+  ArrowColor #445566
+}
+hide empty members
+
+title Entidades del sistema (paquete co.edu.unbosque.horarios.model)
+
+class Asignatura <<@Entity>> {
+  - id : Long
+  - codigo : String
+  - nombre : String
+  - semestre : int
+  - creditos : int
+  - sesionesSemanales : int
+  - requisitosAula : Set<String>
+}
+
+class Seccion <<@Entity>> {
+  - id : Long
+  - codigo : String
+  - grupo : String
+  - estudiantes : int
+  + generarSesiones() : List<Sesion>
+}
+
+class Docente <<@Entity>> {
+  - id : Long
+  - nombre : String
+  + puedeDictar(a : Asignatura) : boolean
+  + estaDisponible(f : Franja) : boolean
+}
+
+class Aula <<@Entity>> {
+  - id : Long
+  - codigo : String
+  - capacidad : int
+  - caracteristicas : Set<String>
+  + cumple(requisitos : Set<String>) : boolean
+}
+
+class Franja <<@Entity>> {
+  - id : Long
+  - dia : DiaSemana
+  - inicio : LocalTime
+  - fin : LocalTime
+}
+
+enum DiaSemana {
+  LUNES
+  MARTES
+  MIERCOLES
+  JUEVES
+  VIERNES
+  SABADO
+}
+
+class Horario <<@Entity>> {
+  - id : Long
+  - periodo : String
+  - generadoEn : LocalDateTime
+  - estado : EstadoHorario
+}
+
+enum EstadoHorario {
+  BORRADOR
+  PUBLICADO
+}
+
+class Asignacion <<@Entity>> {
+  - id : Long
+  - indiceSesion : int
+}
+
+class ParametrosInstitucionales <<@Entity>> {
+  - id : Long
+  - tamanoObjetivo : int = 40
+  - tolerancia : double = 0.10
+  - minimoEstudiantes : int = 10
+  - sesionesMin : int = 1
+  - sesionesMax : int = 4
+  + tamanoMaximo() : int
+}
+
+class Sesion <<no persistente>> {
+  - seccion : Seccion
+  - indice : int
+}
+
+' ---------------- relaciones
+Seccion "0..*" --> "1" Asignatura : pertenece a
+Seccion "0..*" --> "1" Docente : dictada por
+Docente "0..*" --> "1..*" Asignatura : habilitado para
+Docente "0..*" --> "0..*" Franja : disponible en /\nprefiere
+Seccion "1" ..> "1..4" Sesion : genera
+
+Horario "1" *-- "0..*" Asignacion : contiene
+Asignacion "0..*" --> "1" Seccion
+Asignacion "0..*" -left-> "1" Franja
+Asignacion "0..*" --> "1" Aula
+
+Franja --> DiaSemana
+Horario --> EstadoHorario
+
+note bottom of Asignacion
+  Una asignación ubica una clase semanal
+  (sesión número indiceSesion de una sección)
+  en una franja y un aula.
+end note
+
+note bottom of Sesion
+  Se crea en memoria para el motor
+  a partir de cada sección; no se guarda
+  en la base de datos.
+end note
+
+note right of ParametrosInstitucionales
+  Valores configurables por la
+  institución (tope de estudiantes,
+  tolerancia, sesiones por semana).
+end note
+@enduml
