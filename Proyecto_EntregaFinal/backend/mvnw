@@ -1,0 +1,25 @@
+#!/bin/sh
+# Ejecuta Maven. Si Maven no está instalado, lo descarga una sola vez en ~/.m2/wrapper.
+# Uso: ./mvnw spring-boot:run
+set -e
+MVN_VERSION=3.9.11
+
+if command -v mvn >/dev/null 2>&1; then
+  exec mvn "$@"
+fi
+
+BASE="$HOME/.m2/wrapper"
+DIR="$BASE/apache-maven-$MVN_VERSION"
+if [ ! -x "$DIR/bin/mvn" ]; then
+  mkdir -p "$BASE"
+  URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MVN_VERSION/apache-maven-$MVN_VERSION-bin.tar.gz"
+  echo "Descargando Maven $MVN_VERSION (solo la primera vez)..."
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$URL" -o "$BASE/maven.tar.gz"
+  else
+    wget -q "$URL" -O "$BASE/maven.tar.gz"
+  fi
+  tar -xzf "$BASE/maven.tar.gz" -C "$BASE"
+  rm -f "$BASE/maven.tar.gz"
+fi
+exec "$DIR/bin/mvn" "$@"
